@@ -13,6 +13,7 @@ export const profile = {
   collegeEmail: 'yash.24bsa10004@vitbhopal.ac.in',
   phone: '+91 9125200020',
   avatar: '/profile.jpg',
+  avatarSmall: '/avatar.jpg',
   resume: '/Yash_Aryan_Resume.pdf',
   availability: 'Open to SDE / Full Stack internships',
   stats: [

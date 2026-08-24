@@ -20,7 +20,8 @@ DESIGN.md                  Apple design tokens pulled via `npx getdesign add app
 public/
   profile.jpg              hero portrait
   Yash_Aryan_Resume.pdf    served by the "Download résumé" buttons
-  favicon.svg
+  avatar.jpg               256px face crop → nav logo
+  favicon.png · apple-touch-icon.png
 src/
   index.css                Tailwind @theme tokens from DESIGN.md, `:root.dark` token overrides, .glass / .glass-dark surfaces, .shine sweep
   App.tsx                  section order (light → light → dark → light → dark → light → dark → footer)
@@ -55,7 +56,7 @@ src/
 
 - New coding/social profile → add an entry to `src/data/socials.ts`; it automatically appears in the hero pills, Coding cards, Contact row and footer.
 - New project → append to `src/data/projects.ts` (`links` supports `github` and `live`).
-- Replace `public/profile.jpg` / `public/Yash_Aryan_Resume.pdf` to update the photo / résumé.
+- Replace `public/profile.jpg` (hero + OG image), `public/avatar.jpg` (nav logo), `public/favicon.png` / `apple-touch-icon.png`, or `public/Yash_Aryan_Resume.pdf` to update the photo / icons / résumé.
 
 ## Deploy to Vercel
 

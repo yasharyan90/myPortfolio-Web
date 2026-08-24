@@ -41,7 +41,13 @@ export function Navbar() {
         )}
       >
         <a href="#hero" className="flex items-center gap-2.5 font-display text-[17px] font-semibold tracking-[-0.374px] text-ink">
-          <span className="grid h-7 w-7 place-items-center rounded-[8px] bg-primary text-[12px] font-semibold text-white">YA</span>
+          <img
+            src={profile.avatarSmall}
+            alt=""
+            width={28}
+            height={28}
+            className="h-7 w-7 rounded-[8px] object-cover ring-1 ring-black/10 dark:ring-white/15"
+          />
           <span className="hidden sm:inline">{profile.name}</span>
         </a>
 
