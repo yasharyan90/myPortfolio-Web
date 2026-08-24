@@ -1,0 +1,10 @@
+node_modules
+dist
+.vercel
+.DS_Store
+*.local
+.idea
+# source docs — the site serves copies from public/
+/Yash_Aryan_Resume_ATS.pdf
+/resume_Yash_updated (4).pdf
+/WhatsApp Image*.jpeg

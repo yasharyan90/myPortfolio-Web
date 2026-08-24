@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import "tailwindcss";
+
+/* ── Apple design tokens (from DESIGN.md) ─────────────────────────────── */
+@theme {
+  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  --font-text: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
+
+  --color-primary: #0066cc;
+  --color-primary-focus: #0071e3;
+  --color-sky: #2997ff;
+  --color-ink: #1d1d1f;
+  --color-ink-80: #333333;
+  --color-ink-48: #7a7a7a;
+  --color-muted-dark: #cccccc;
+  --color-hairline: #e0e0e0;
+  --color-divider: #f0f0f0;
+  --color-canvas: #ffffff;
+  --color-parchment: #f5f5f7;
+  --color-pearl: #fafafc;
+  --color-tile-1: #272729;
+  --color-tile-2: #2a2a2c;
+  --color-tile-3: #252527;
+  --color-chip: #d2d2d7;
+
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius-lg: 18px;
+
+  --shadow-product: 3px 5px 30px 0 rgba(0, 0, 0, 0.22);
+  --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    @apply bg-parchment text-ink font-text;
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+    font-feature-settings: "ss03";
+    overflow-x: hidden;
+  }
+  ::selection { background: #0066cc; color: #fff; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+}
+
+/* ── Liquid glass surfaces ────────────────────────────────────────────── */
+@layer components {
+  .glass,
+  .glass-dark {
+    position: relative;
+    isolation: isolate;
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+  }
+  .glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.42) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 0 rgba(255, 255, 255, 0.35),
+      inset 1px 0 0 0 rgba(255, 255, 255, 0.55),
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 16px 40px -16px rgba(0, 0, 0, 0.12);
+  }
+  .glass-dark {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.28),
+      inset 0 -1px 0 0 rgba(0, 0, 0, 0.25),
+      0 24px 60px -24px rgba(0, 0, 0, 0.55);
+  }
+  /* caustic highlight in the top-left corner — the "liquid" sheen */
+  .glass::before,
+  .glass-dark::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.55), transparent 55%);
+  }
+  .glass-dark::before { opacity: 0.35; }
+
+  .container-apple { @apply mx-auto w-full max-w-[1120px] px-6 sm:px-8; }
+  .section { @apply py-20 md:py-28; }
+
+  .shine {
+    @apply pointer-events-none absolute inset-0 -translate-x-full;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%);
+    transition: transform 0.9s var(--ease-apple);
+  }
+  .group:hover .shine { transform: translateX(100%); }
+
+  .orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(80px);
+    pointer-events: none;
+    will-change: transform;
+  }
+}

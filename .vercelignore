@@ -1,0 +1,4 @@
+.idea
+*.pdf
+!public/*.pdf
+WhatsApp Image*

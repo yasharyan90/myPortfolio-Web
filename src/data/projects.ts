@@ -1,0 +1,91 @@
+export interface ProjectLink {
+  label: string
+  href: string
+  kind: 'github' | 'live'
+}
+
+export interface Project {
+  id: string
+  name: string
+  subtitle: string
+  kind: string
+  accent: string
+  monogram: string
+  description: string
+  highlights: string[]
+  stack: string[]
+  links: ProjectLink[]
+  metrics: { label: string; value: string }[]
+}
+
+export const projects: Project[] = [
+  {
+    id: 'vit-live',
+    name: 'VIT Live',
+    subtitle: 'Real-Time Campus Engagement Platform',
+    kind: 'Personal project',
+    accent: '#0066cc',
+    monogram: 'VL',
+    description:
+      'A full-stack real-time platform for campus life — live announcements, emergency alerts, polls and club feeds delivered in under a second.',
+    highlights: [
+      'Architected 5-role RBAC with live announcements, emergency alerts, polls and club feeds over WebSockets + Redis Pub/Sub — sub-second delivery.',
+      'Integrated Razorpay with HMAC-SHA256 signature verification, QR-code event ticketing and live attendee check-in.',
+      'JWT auth with rotating refresh tokens, OTP verification, anonymous polling, audit logging and CI-tested REST APIs.',
+      'Installable React PWA with offline support, FCM push notifications, admin dashboard, scheduled publishing and S3-compatible storage.',
+    ],
+    stack: ['Go (Fiber)', 'React 19', 'TypeScript', 'PostgreSQL', 'Redis Pub/Sub', 'WebSockets', 'Razorpay', 'Tailwind CSS', 'Framer Motion', 'PWA'],
+    links: [{ label: 'Source on GitHub', href: 'https://github.com/yasharyan90/vit-live', kind: 'github' }],
+    metrics: [
+      { label: 'Delivery', value: '< 1s' },
+      { label: 'Roles', value: '5' },
+      { label: 'Monorepo', value: '13K+ LOC' },
+    ],
+  },
+  {
+    id: 'aurum',
+    name: 'Aurum Luxury Boutique',
+    subtitle: 'Full Stack E-Commerce Platform',
+    kind: 'Personal project · Production',
+    accent: '#a67c00',
+    monogram: 'AU',
+    description:
+      'A production-deployed luxury storefront processing real transactions, with dual customer/owner dashboards and live order tracking.',
+    highlights: [
+      'Dual authentication (customer + owner RBAC) secured with Supabase Row Level Security and JWT.',
+      'Razorpay gateway with automated GST calculation and EmailJS order confirmations on real transactions.',
+      'Supabase Realtime order tracking — status updates reflect in the customer dashboard within 2 seconds of owner action.',
+      'Responsive dark-mode UI with dynamic skeleton loaders, plus customer wallet and coupon services.',
+    ],
+    stack: ['React.js', 'Supabase', 'PostgreSQL', 'Razorpay', 'EmailJS', 'CSS Modules', 'React Router', 'Vercel'],
+    links: [{ label: 'Live store', href: 'https://aurum-luxury-ecom-store-main-store-six.vercel.app', kind: 'live' }],
+    metrics: [
+      { label: 'Order sync', value: '< 2s' },
+      { label: 'Payments', value: 'Live' },
+      { label: 'Auth', value: 'RLS + JWT' },
+    ],
+  },
+  {
+    id: 'uhip',
+    name: 'UHIP',
+    subtitle: 'Unified Health Intelligence Platform',
+    kind: 'Team project · S Grade',
+    accent: '#2a9d8f',
+    monogram: 'UH',
+    description:
+      'A cloud-native, multi-service healthcare platform — I led containerization and Docker-based deployment across five services.',
+    highlights: [
+      'Led containerization and Docker deployment of React, Express.js, FastAPI, PostgreSQL and MongoDB microservices.',
+      'Configured service orchestration, container networking, persistent volumes and environment config via Docker Compose.',
+      'Ran system debugging, integration testing and deployment analysis to harden reliability and performance.',
+      'Awarded S Grade and presented at the College Project Exhibition.',
+    ],
+    stack: ['Docker', 'Docker Compose', 'Node.js', 'Express.js', 'React', 'Vite', 'PostgreSQL', 'MongoDB', 'FastAPI'],
+    links: [],
+    metrics: [
+      { label: 'Services', value: '5' },
+      { label: 'Grade', value: 'S' },
+      { label: 'Role', value: 'DevOps lead' },
+    ],
+  },
+]
