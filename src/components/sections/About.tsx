@@ -36,7 +36,7 @@ export function About() {
 
           <motion.div variants={fadeUp}>
             <GlassPanel className="h-full rounded-[18px] p-7">
-              <ul className="divide-y divide-black/[0.06]">
+              <ul className="divide-y divide-black/[0.06] dark:divide-white/10">
                 {profile.facts.map((f) => (
                   <li key={f.label} className="py-3.5 first:pt-0 last:pb-0">
                     <p className="text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-48">{f.label}</p>

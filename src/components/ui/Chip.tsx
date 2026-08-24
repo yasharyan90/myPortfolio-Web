@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
+import { useEffectiveTone } from '../../hooks/useTheme'
 import { cn } from '../../lib/cn'
 import { spring } from '../../lib/motion'
 import type { Tone } from './GlassPanel'
@@ -17,6 +18,7 @@ const chipVariants = {
 }
 
 export function Chip({ children, tone = 'light', className, animated = true }: Props) {
+  const effective = useEffectiveTone(tone)
   return (
     <motion.span
       variants={animated ? chipVariants : undefined}
@@ -24,7 +26,7 @@ export function Chip({ children, tone = 'light', className, animated = true }: P
       transition={spring}
       className={cn(
         'inline-flex cursor-default items-center rounded-full border px-3 py-1.5 text-[13px] tracking-[-0.2px] select-none',
-        tone === 'light'
+        effective === 'light'
           ? 'border-black/[0.06] bg-white/70 text-ink-80 hover:border-primary/40 hover:bg-white'
           : 'border-white/10 bg-white/[0.07] text-white/85 hover:border-sky/50 hover:bg-white/[0.12]',
         className,

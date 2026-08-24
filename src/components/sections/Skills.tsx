@@ -48,7 +48,7 @@ export function Skills() {
             Core competencies
           </motion.span>
           {competencies.map((c) => (
-            <Chip key={c} className="bg-ink text-white hover:bg-ink hover:text-white">
+            <Chip key={c} className="border-transparent bg-ink text-on-ink hover:border-transparent hover:bg-ink hover:text-on-ink dark:bg-ink dark:text-on-ink dark:hover:bg-ink">
               {c}
             </Chip>
           ))}

@@ -136,7 +136,7 @@ export function Hero() {
         animate="show"
         className="container-apple mt-16 hidden lg:block"
       >
-        <GlassPanel spotlight={false} className="grid grid-cols-4 divide-x divide-black/[0.06] rounded-[18px]">
+        <GlassPanel spotlight={false} className="grid grid-cols-4 divide-x divide-black/[0.06] rounded-[18px] dark:divide-white/10">
           {profile.stats.map((s) => (
             <motion.div key={s.label} variants={fadeUp} className="px-6 py-4">
               <p className="font-display text-[28px] font-semibold leading-none tracking-[-0.01em] text-ink">

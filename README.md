@@ -4,6 +4,8 @@ Apple-style, liquid-glass portfolio built from `Yash_Aryan_Resume_ATS.pdf`.
 
 **Stack:** Vite · React 19 · TypeScript · Tailwind CSS v4 · Framer Motion · react-icons / lucide-react
 
+Light and dark themes: the sun/moon toggle in the nav persists to `localStorage` and otherwise follows the OS setting (applied before first paint, no flash).
+
 ```bash
 npm install
 npm run dev       # http://localhost:5173 (use --port 5180 if 5173 is busy)
@@ -20,7 +22,7 @@ public/
   Yash_Aryan_Resume.pdf    served by the "Download résumé" buttons
   favicon.svg
 src/
-  index.css                Tailwind @theme tokens from DESIGN.md + .glass / .glass-dark liquid-glass surfaces + .shine sweep
+  index.css                Tailwind @theme tokens from DESIGN.md, `:root.dark` token overrides, .glass / .glass-dark surfaces, .shine sweep
   App.tsx                  section order (light → light → dark → light → dark → light → dark → footer)
   data/                    ALL content lives here — edit these, never the components
     profile.ts             name, tagline, contact, stats, quick facts
@@ -31,9 +33,11 @@ src/
     cn.ts
   hooks/
     useActiveSection.ts    IntersectionObserver → active nav pill
+    useTheme.tsx           ThemeProvider (light/dark, localStorage + prefers-color-scheme) · useEffectiveTone()
   components/
     ui/
       GlassPanel.tsx       liquid-glass card with cursor-following specular highlight
+      ThemeToggle.tsx      animated sun/moon switch
       GlassButton.tsx      Apple pill button (primary / glass / glassDark / ink) — magnetic + shine + press
       SocialButton.tsx     animated profile-link button: `pill` (hero/contact), `icon` (footer), `card` (Coding section)
       Magnetic.tsx         cursor-attraction wrapper (spring)

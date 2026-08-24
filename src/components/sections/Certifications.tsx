@@ -26,7 +26,7 @@ export function Certifications() {
                   <span className="grid h-10 w-10 place-items-center rounded-[11px] bg-primary/10 text-primary">
                     <Award className="h-5 w-5" />
                   </span>
-                  {c.badge && <span className="rounded-full bg-ink px-2.5 py-1 text-[12px] font-semibold text-white">{c.badge}</span>}
+                  {c.badge && <span className="rounded-full bg-ink px-2.5 py-1 text-[12px] font-semibold text-on-ink">{c.badge}</span>}
                 </div>
                 <h3 className="mt-5 font-display text-[19px] font-semibold leading-snug text-ink">{c.title}</h3>
                 <p className="mt-1 text-[14px] tracking-[-0.224px] text-ink-48">

@@ -6,6 +6,7 @@ import { useActiveSection } from '../../hooks/useActiveSection'
 import { cn } from '../../lib/cn'
 import { appleEase, spring } from '../../lib/motion'
 import { GlassButton } from '../ui/GlassButton'
+import { ThemeToggle } from '../ui/ThemeToggle'
 
 export const NAV_LINKS = [
   { id: 'about', label: 'About' },
@@ -53,7 +54,7 @@ export function Navbar() {
                   href={`#${l.id}`}
                   className={cn(
                     'relative z-10 block rounded-full px-3.5 py-2 text-[13px] tracking-[-0.12px] transition-colors duration-300',
-                    isActive ? 'text-white' : 'text-ink-80 hover:text-ink',
+                    isActive ? 'text-on-ink' : 'text-ink-80 hover:text-ink',
                   )}
                 >
                   {l.label}
@@ -71,6 +72,7 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <div className="hidden sm:block">
             <GlassButton href={profile.resume} size="sm" download icon={<Download className="h-3.5 w-3.5" />} magnetic={false}>
               Résumé
@@ -106,7 +108,7 @@ export function Navbar() {
                 transition={{ delay: 0.04 * i, ease: appleEase }}
                 className={cn(
                   'block rounded-[11px] px-4 py-3 text-[17px] tracking-[-0.374px]',
-                  active === l.id ? 'bg-ink text-white' : 'text-ink hover:bg-white/60',
+                  active === l.id ? 'bg-ink text-on-ink' : 'text-ink hover:bg-white/60 dark:hover:bg-white/10',
                 )}
               >
                 {l.label}

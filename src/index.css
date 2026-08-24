@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ── Apple design tokens (from DESIGN.md) ─────────────────────────────── */
 @theme {
   --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
@@ -23,6 +25,7 @@
   --color-tile-2: #2a2a2c;
   --color-tile-3: #252527;
   --color-chip: #d2d2d7;
+  --color-on-ink: #ffffff;
 
   --radius-xs: 5px;
   --radius-sm: 8px;
@@ -31,6 +34,26 @@
 
   --shadow-product: 3px 5px 30px 0 rgba(0, 0, 0, 0.22);
   --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Dark theme: flip the tokens, every utility follows ───────────────── */
+:root.dark {
+  --color-primary: #0a84ff;
+  --color-primary-focus: #409cff;
+  --color-sky: #64b5ff;
+  --color-ink: #f5f5f7;
+  --color-ink-80: #d1d1d6;
+  --color-ink-48: #98989d;
+  --color-on-ink: #0b0b0e;
+  --color-hairline: #2a2a2d;
+  --color-divider: #1f1f22;
+  --color-canvas: #1c1c1e;
+  --color-parchment: #0b0b0e;
+  --color-pearl: #202023;
+  --color-tile-1: #161619;
+  --color-tile-2: #19191c;
+  --color-tile-3: #131316;
+  --color-chip: #3a3a3c;
 }
 
 @layer base {
@@ -43,7 +66,8 @@
     font-feature-settings: "ss03";
     overflow-x: hidden;
   }
-  ::selection { background: #0066cc; color: #fff; }
+  ::selection { background: var(--color-primary); color: #fff; }
+  html, body { transition: background-color 0.4s var(--ease-apple), color 0.4s var(--ease-apple); }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
   }
@@ -68,7 +92,8 @@
       0 1px 2px rgba(0, 0, 0, 0.04),
       0 16px 40px -16px rgba(0, 0, 0, 0.12);
   }
-  .glass-dark {
+  .glass-dark,
+  .dark .glass {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.05) 100%);
     border: 1px solid rgba(255, 255, 255, 0.16);
     box-shadow:
@@ -87,7 +112,8 @@
     z-index: 0;
     background: radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.55), transparent 55%);
   }
-  .glass-dark::before { opacity: 0.35; }
+  .glass-dark::before,
+  .dark .glass::before { opacity: 0.35; }
 
   .container-apple { @apply mx-auto w-full max-w-[1120px] px-6 sm:px-8; }
   .section { @apply py-20 md:py-28; }

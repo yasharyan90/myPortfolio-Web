@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import type { Social } from '../../data/socials'
+import { useEffectiveTone } from '../../hooks/useTheme'
 import { cn } from '../../lib/cn'
 import { fadeUp, spring } from '../../lib/motion'
 import type { Tone } from './GlassPanel'
@@ -24,8 +25,9 @@ const hoverGlow = { rest: { opacity: 0 }, hover: { opacity: 1 } }
  *  - icon: compact circular (navbar / footer)
  *  - card: large tile with handle + blurb (Coding section)
  */
-export function SocialButton({ social, tone = 'light', variant = 'pill', className }: Props) {
+export function SocialButton({ social, tone: requestedTone = 'light', variant = 'pill', className }: Props) {
   const Icon = social.icon
+  const tone = useEffectiveTone(requestedTone)
   const brand = tone === 'dark' ? (social.colorOnDark ?? social.color) : social.color
   const isExternal = !social.href.startsWith('mailto:')
   const style = { '--brand': brand } as CSSProperties
@@ -122,7 +124,7 @@ export function SocialButton({ social, tone = 'light', variant = 'pill', classNa
           <motion.div
             variants={hoverIcon}
             transition={spring}
-            className="grid h-14 w-14 place-items-center rounded-2xl text-white"
+            className="grid h-14 w-14 place-items-center rounded-2xl text-white ring-1 ring-white/10"
             style={{ backgroundColor: social.color, boxShadow: `0 10px 30px -10px ${social.color}99` }}
           >
             <Icon size={26} />

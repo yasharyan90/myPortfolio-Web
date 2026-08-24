@@ -26,7 +26,7 @@ const variants: Record<Variant, string> = {
   primary: 'bg-primary text-white hover:bg-primary-focus',
   glass: 'glass text-ink',
   glassDark: 'glass-dark text-white',
-  ink: 'bg-ink text-white',
+  ink: 'bg-ink text-on-ink',
 }
 
 const sizes: Record<Size, string> = {

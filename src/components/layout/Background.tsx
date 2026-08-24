@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion'
+import { useEffectiveTone } from '../../hooks/useTheme'
 import { cn } from '../../lib/cn'
 import type { Tone } from '../ui/GlassPanel'
 
@@ -16,8 +17,9 @@ const orbs = [
 ]
 
 /** Soft drifting orbs — the depth that liquid glass refracts. */
-export function Background({ tone = 'light', mode = 'fixed', className }: Props) {
+export function Background({ tone: requestedTone = 'light', mode = 'fixed', className }: Props) {
   const reduce = useReducedMotion()
+  const tone = useEffectiveTone(requestedTone)
   return (
     <div
       aria-hidden
