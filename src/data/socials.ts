@@ -31,8 +31,8 @@ export const socials: Social[] = [
   {
     id: 'leetcode',
     label: 'LeetCode',
-    handle: 'YashAryan90',
-    href: 'https://leetcode.com/u/YashAryan90/',
+    handle: 'Yash_Aryan90',
+    href: 'https://leetcode.com/u/Yash_Aryan90/',
     color: '#FFA116',
     icon: SiLeetcode,
     blurb: 'Daily DSA practice — arrays to graphs to DP.',
