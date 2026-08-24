@@ -53,6 +53,18 @@ src/
 - New project → append to `src/data/projects.ts` (`links` supports `github` and `live`).
 - Replace `public/profile.jpg` / `public/Yash_Aryan_Resume.pdf` to update the photo / résumé.
 
-## Deploy
+## Deploy to Vercel
 
-Static output in `dist/` — deploy to Vercel/Netlify/GitHub Pages with no config (`vercel` from the project root works out of the box).
+`vercel.json` is already configured (Vite framework preset, `dist/` output, SPA rewrite, immutable caching for `/assets`, security headers).
+
+**Option A — CLI**
+```bash
+npx vercel login          # one-time, opens browser
+npx vercel                # preview deployment
+npx vercel --prod         # production
+```
+
+**Option B — Git integration**
+1. Push this repo to GitHub: `gh repo create yasharyan90/portfolio --public --source=. --push`
+2. Import it at https://vercel.com/new — the framework is auto-detected; no settings needed.
+3. Every push to `main` deploys to production, PRs get preview URLs.
