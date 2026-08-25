@@ -53,8 +53,10 @@ export const projects: Project[] = [
     name: 'VIT Live',
     subtitle: 'Real-Time Campus Engagement Platform',
     kind: 'Personal project',
-    accent: '#0066cc',
+    accent: '#d8643c',
     monogram: 'VL',
+    cover: '/projects/vit-live.jpg',
+    coverPosition: 'left top',
     description:
       'A full-stack real-time platform for campus life — live announcements, emergency alerts, polls and club feeds delivered in under a second.',
     highlights: [
