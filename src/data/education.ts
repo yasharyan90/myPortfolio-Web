@@ -33,4 +33,10 @@ export const education: Education[] = [
     period: 'Graduated May 2023',
     location: 'Prayagraj, Uttar Pradesh',
   },
+  {
+    school: 'Sunbeam Academy',
+    degree: 'Primary & Secondary Education · Class X',
+    period: 'Passed 2021',
+    location: 'Samne Ghat, Varanasi, Uttar Pradesh',
+  },
 ]
