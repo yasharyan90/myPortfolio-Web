@@ -27,15 +27,15 @@ export const projects: Project[] = [
     id: 'lumiere',
     name: 'Lumière',
     subtitle: 'Members-Only Movie Streaming Platform',
-    kind: 'Personal project · Live',
+    kind: 'Personal project · Live demo',
     accent: '#e11d48',
     monogram: 'LU',
     cover: '/projects/lumiere.jpg',
     coverPosition: 'left top',
     description:
-      'A private screening room on the web — hand-curated movies, shows and anime streamed ad-free in up to 1080p behind a paid membership, on Neon Postgres and Cloudflare for seamless content delivery.',
+      'A private screening room on the web — hand-curated movies, shows and anime streamed ad-free in up to 1080p behind a demo membership, on Neon Postgres and Cloudflare for seamless content delivery.',
     highlights: [
-      'Subscription membership with monthly (₹100) and quarterly (₹199) plans, screen limits per plan and cancel-anytime billing.',
+      'Demo membership flow — sample monthly (₹100) and quarterly (₹199) plans with per-plan screen limits and cancel-anytime billing; no real charges.',
       'Resume-where-you-stopped playback synced to the second across devices, with concurrent-screen enforcement.',
       'Member and owner entrances: a curated catalogue for members and an owner dashboard for managing the shelf.',
       'Catalogue, memberships and watch progress live in Neon serverless Postgres — branchable, autoscaling and sub-100 ms from the edge.',
