@@ -86,7 +86,6 @@ export function Contact() {
               <span className="inline-flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5 text-sky" /> {profile.phone}
               </span>
-              <span className="hidden h-4 w-px bg-white/15 sm:block" />
               <span className="inline-flex items-center gap-2">
                 <Mail className="h-3.5 w-3.5 text-sky" /> {profile.collegeEmail}
               </span>
