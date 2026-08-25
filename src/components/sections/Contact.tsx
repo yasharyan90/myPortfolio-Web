@@ -82,13 +82,15 @@ export function Contact() {
           </motion.div>
 
           <motion.div variants={fadeUp} className="mt-10">
-            <GlassPanel tone="dark" spotlight={false} className="inline-flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-full px-6 py-3 text-[14px] text-muted-dark">
-              <span className="inline-flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5 text-sky" /> {profile.phone}
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <Mail className="h-3.5 w-3.5 text-sky" /> {profile.collegeEmail}
-              </span>
+            <GlassPanel tone="dark" spotlight={false} className="inline-block rounded-full px-6 py-3 text-[14px] text-muted-dark">
+              <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+                <a href={`tel:${profile.phone.replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 transition-colors hover:text-white">
+                  <Phone className="h-3.5 w-3.5 text-sky" /> {profile.phone}
+                </a>
+                <a href={`mailto:${profile.collegeEmail}`} className="inline-flex items-center gap-2 transition-colors hover:text-white">
+                  <Mail className="h-3.5 w-3.5 text-sky" /> {profile.collegeEmail}
+                </a>
+              </div>
             </GlassPanel>
           </motion.div>
         </motion.div>
