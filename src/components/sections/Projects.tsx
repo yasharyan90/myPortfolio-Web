@@ -24,13 +24,28 @@ function ProjectCard({ p, index }: { p: Project; index: number }) {
               background: `radial-gradient(120% 90% at 15% 10%, ${p.accent}cc, transparent 55%), radial-gradient(90% 90% at 90% 90%, ${p.accent}66, transparent 60%), #1a1a1c`,
             }}
           >
-            <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.6)_1px,transparent_1px)] [background-size:32px_32px]" />
-            <div className="absolute left-6 top-6 flex items-center gap-2">
+            {p.cover ? (
+              <>
+                <img
+                  src={p.cover}
+                  alt={`${p.name} — live product screenshot`}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  style={{ objectPosition: p.coverPosition ?? 'top' }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/10" />
+              </>
+            ) : (
+              <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.6)_1px,transparent_1px)] [background-size:32px_32px]" />
+            )}
+            <div className="absolute right-5 top-5 flex items-center gap-2">
               <span className="glass-dark rounded-full px-3 py-1 text-[12px] text-white/90">{p.kind}</span>
             </div>
+            {!p.cover && (
             <span className="absolute bottom-4 right-6 select-none font-display text-[88px] font-semibold leading-none tracking-[-0.04em] text-white/90 mix-blend-overlay sm:text-[120px] md:text-[160px]">
               {p.monogram}
             </span>
+            )}
             <div className="absolute bottom-6 left-6 flex gap-4">
               {p.metrics.map((m) => (
                 <div key={m.label} className="glass-dark rounded-[11px] px-3 py-2">
@@ -93,7 +108,7 @@ export function Projects() {
           tone="dark"
           eyebrow="Projects"
           title="Built to run in production."
-          subtitle="Real-time platforms, live payments and containerized services — designed, shipped and debugged end to end."
+          subtitle="Streaming, real-time and e-commerce platforms with live payments — designed, shipped and debugged end to end."
         />
         <motion.div variants={stagger(0.15)} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} className="mt-12 space-y-6">
           {projects.map((p, i) => (

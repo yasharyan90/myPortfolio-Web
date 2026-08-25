@@ -18,6 +18,7 @@ npm run preview
 ```
 DESIGN.md                  Apple design tokens pulled via `npx getdesign add apple` (source of truth for colors/type/radius)
 public/
+  projects/*.jpg           live-site screenshots used as project covers (Lumière, Aurum)
   profile.jpg              hero portrait
   Yash_Aryan_Resume.pdf    served by the "Download résumé" buttons
   avatar.jpg               256px face crop → nav logo
@@ -55,7 +56,7 @@ src/
 ## Updating content
 
 - New coding/social profile → add an entry to `src/data/socials.ts`; it automatically appears in the hero pills, Coding cards, Contact row and footer.
-- New project → append to `src/data/projects.ts` (`links` supports `github` and `live`).
+- New project → append to `src/data/projects.ts` (`links` supports `github` and `live`; set `cover` to a screenshot in `public/projects/` to replace the monogram tile).
 - Replace `public/profile.jpg` (hero + OG image), `public/avatar.jpg` (nav logo), `public/favicon.png` / `apple-touch-icon.png`, or `public/Yash_Aryan_Resume.pdf` to update the photo / icons / résumé.
 
 ## Deploy to Vercel

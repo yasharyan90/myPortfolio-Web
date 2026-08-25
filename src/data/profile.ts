@@ -20,7 +20,7 @@ export const profile = {
     { label: 'DSA problems solved', value: 500, suffix: '+' },
     { label: 'CGPA at VIT Bhopal', value: 8.5, suffix: ' / 10', decimals: 1 },
     { label: 'Lines of code in VIT Live', value: 13, suffix: 'K+' },
-    { label: 'Certifications earned', value: 3, suffix: '' },
+    { label: 'Production apps live', value: 2, suffix: '' },
   ],
   facts: [
     { label: 'Based in', value: 'Bhopal, India' },

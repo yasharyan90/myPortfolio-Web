@@ -11,6 +11,10 @@ export interface Project {
   kind: string
   accent: string
   monogram: string
+  /** screenshot of the live product, shown instead of the generated monogram cover */
+  cover?: string
+  /** CSS object-position for the cover crop (default: 'top') */
+  coverPosition?: string
   description: string
   highlights: string[]
   stack: string[]
@@ -19,6 +23,31 @@ export interface Project {
 }
 
 export const projects: Project[] = [
+  {
+    id: 'lumiere',
+    name: 'Lumière',
+    subtitle: 'Members-Only Movie Streaming Platform',
+    kind: 'Personal project · Live',
+    accent: '#e11d48',
+    monogram: 'LU',
+    cover: '/projects/lumiere.jpg',
+    coverPosition: 'left top',
+    description:
+      'A private screening room on the web — hand-curated movies, shows and anime streamed ad-free in up to 1080p, behind a paid membership.',
+    highlights: [
+      'Subscription membership with monthly (₹100) and quarterly (₹199) plans, screen limits per plan and cancel-anytime billing.',
+      'Resume-where-you-stopped playback synced to the second across devices, with concurrent-screen enforcement.',
+      'Member and owner entrances: a curated catalogue for members and an owner dashboard for managing the shelf.',
+      'Built with Next.js (Turbopack) and deployed on Vercel with light/dark themes and a glass-morphism UI.',
+    ],
+    stack: ['Next.js', 'React', 'TypeScript', 'Vercel', 'Video Streaming', 'Subscriptions', 'RBAC'],
+    links: [{ label: 'Watch it live', href: 'https://lumiere-project-lime.vercel.app/', kind: 'live' }],
+    metrics: [
+      { label: 'Quality', value: '1080p' },
+      { label: 'Plans', value: '2' },
+      { label: 'Ads', value: 'Zero' },
+    ],
+  },
   {
     id: 'vit-live',
     name: 'VIT Live',
@@ -49,6 +78,7 @@ export const projects: Project[] = [
     kind: 'Personal project · Production',
     accent: '#a67c00',
     monogram: 'AU',
+    cover: '/projects/aurum.jpg',
     description:
       'A production-deployed luxury storefront processing real transactions, with dual customer/owner dashboards and live order tracking.',
     highlights: [
