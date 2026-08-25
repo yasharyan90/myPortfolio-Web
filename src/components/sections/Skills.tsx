@@ -28,9 +28,17 @@ export function Skills() {
                 <h3 className="font-display text-[21px] font-semibold leading-tight text-ink">{g.title}</h3>
                 <p className="mt-1 text-[14px] tracking-[-0.224px] text-ink-48">{g.description}</p>
                 <motion.div variants={stagger(0.04)} className="mt-5 flex flex-wrap gap-2">
-                  {g.items.map((item) => (
-                    <Chip key={item}>{item}</Chip>
-                  ))}
+                  {g.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <Chip key={item.name} className="gap-1.5 pl-2.5">
+                        <span className="grid place-items-center" style={item.color ? { color: item.color } : undefined} aria-hidden>
+                          <Icon size={14} />
+                        </span>
+                        {item.name}
+                      </Chip>
+                    )
+                  })}
                 </motion.div>
               </GlassPanel>
             </motion.div>
