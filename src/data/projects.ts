@@ -33,18 +33,20 @@ export const projects: Project[] = [
     cover: '/projects/lumiere.jpg',
     coverPosition: 'left top',
     description:
-      'A private screening room on the web — hand-curated movies, shows and anime streamed ad-free in up to 1080p, behind a paid membership.',
+      'A private screening room on the web — hand-curated movies, shows and anime streamed ad-free in up to 1080p behind a paid membership, on Neon Postgres and Cloudflare for seamless content delivery.',
     highlights: [
       'Subscription membership with monthly (₹100) and quarterly (₹199) plans, screen limits per plan and cancel-anytime billing.',
       'Resume-where-you-stopped playback synced to the second across devices, with concurrent-screen enforcement.',
       'Member and owner entrances: a curated catalogue for members and an owner dashboard for managing the shelf.',
+      'Catalogue, memberships and watch progress live in Neon serverless Postgres — branchable, autoscaling and sub-100 ms from the edge.',
+      'Video and static assets served through Cloudflare\'s global CDN with edge caching, so playback starts instantly and never buffers on a shared origin.',
       'Built with Next.js (Turbopack) and deployed on Vercel with light/dark themes and a glass-morphism UI.',
     ],
-    stack: ['Next.js', 'React', 'TypeScript', 'Vercel', 'Video Streaming', 'Subscriptions', 'RBAC'],
+    stack: ['Next.js', 'React', 'TypeScript', 'Neon Postgres', 'Cloudflare CDN', 'Vercel', 'Video Streaming', 'Subscriptions', 'RBAC'],
     links: [{ label: 'Watch it live', href: 'https://lumiere-project-lime.vercel.app/', kind: 'live' }],
     metrics: [
       { label: 'Quality', value: '1080p' },
-      { label: 'Plans', value: '2' },
+      { label: 'Delivery', value: 'Edge CDN' },
       { label: 'Ads', value: 'Zero' },
     ],
   },

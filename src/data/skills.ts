@@ -23,12 +23,12 @@ export const skillGroups: SkillGroup[] = [
   {
     title: 'Databases',
     description: 'Relational, document, in-memory.',
-    items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Supabase', 'Amazon DynamoDB'],
+    items: ['PostgreSQL', 'Neon (serverless Postgres)', 'MySQL', 'MongoDB', 'Redis', 'Supabase', 'Amazon DynamoDB'],
   },
   {
     title: 'Cloud & DevOps',
     description: 'From laptop to production.',
-    items: ['AWS EC2', 'AWS S3', 'Docker', 'Docker Compose', 'CI/CD', 'Vercel', 'Linux', 'Git', 'GitHub'],
+    items: ['AWS EC2', 'AWS S3', 'Cloudflare CDN', 'Docker', 'Docker Compose', 'CI/CD', 'Vercel', 'Linux', 'Git', 'GitHub'],
   },
   {
     title: 'Tools & Platforms',
