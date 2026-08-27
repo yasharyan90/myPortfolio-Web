@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion'
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion' // framer
 import { Download, Menu, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { profile } from '../../data/profile'
