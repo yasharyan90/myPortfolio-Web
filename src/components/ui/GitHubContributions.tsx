@@ -4,7 +4,7 @@ import { ActivityCalendar } from 'react-activity-calendar'
 import { SiGithub } from 'react-icons/si'
 import { bySocialId } from '../../data/socials'
 import { useTheme } from '../../hooks/useTheme'
-import type { ContributionCalendar } from '../../lib/contributions'
+import type { ContributionCalendar } from '../../../api/contributions'
 import { GlassPanel } from './GlassPanel'
 
 /** GitHub's own contribution scales, so the graph reads exactly like the one on github.com */

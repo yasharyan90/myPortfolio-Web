@@ -1,7 +1,7 @@
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { handleContributionsRequest } from './src/lib/contributions'
+import { handleContributionsRequest } from './api/contributions'
 
 /** Serves /api/contributions during `vite dev` with the same handler Vercel runs in production. */
 function devApi(): Plugin {
