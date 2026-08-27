@@ -10,6 +10,7 @@ import { Education } from './components/sections/Education'
 import { Hero } from './components/sections/Hero'
 import { Projects } from './components/sections/Projects'
 import { Skills } from './components/sections/Skills'
+import { Terminal } from './components/terminal/Terminal'
 
 /**
  * Section rhythm follows the Apple "pulse": light hero → light → dark tile → light → dark → light → dark → parchment footer.
@@ -32,6 +33,7 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
+      <Terminal />
     </>
   )
 }

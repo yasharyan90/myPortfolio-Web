@@ -6,6 +6,7 @@ import { useActiveSection } from '../../hooks/useActiveSection'
 import { cn } from '../../lib/cn'
 import { appleEase, spring } from '../../lib/motion'
 import { GlassButton } from '../ui/GlassButton'
+import { TerminalToggle } from '../ui/TerminalToggle'
 import { ThemeToggle } from '../ui/ThemeToggle'
 
 export const NAV_LINKS = [
@@ -78,6 +79,7 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <TerminalToggle />
           <ThemeToggle />
           <div className="hidden sm:block">
             <GlassButton href={profile.resume} size="sm" download icon={<Download className="h-3.5 w-3.5" />} magnetic={false}>
