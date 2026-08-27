@@ -194,3 +194,14 @@
 @media (prefers-reduced-motion: reduce) {
   .term-toggle-cursor { animation: none !important; }
 }
+
+/* ── GitHub contribution calendar (react-github-calendar) ─────────────── */
+@layer components {
+  .gh-calendar .react-activity-calendar { width: 100%; }
+  .gh-calendar .react-activity-calendar__scroll-container { padding-bottom: 4px; scrollbar-width: thin; }
+  .gh-calendar .react-activity-calendar__footer { color: var(--color-ink-48); font-size: 12px; letter-spacing: -0.12px; }
+  .gh-calendar svg text { fill: var(--color-ink-48); }
+  .gh-calendar rect { transition: opacity 0.2s var(--ease-apple); }
+  .gh-calendar svg:hover rect:not(:hover) { opacity: 0.82; }
+  .gh-calendar rect:hover { stroke: var(--color-ink); stroke-width: 1px; stroke-opacity: 0.35; }
+}

@@ -5,6 +5,7 @@ import { profile } from '../../data/profile'
 import { socials } from '../../data/socials'
 import { appleEase, fadeUp, stagger } from '../../lib/motion'
 import { CountUp } from '../ui/CountUp'
+import { GitHubContributions } from '../ui/GitHubContributions'
 import { GlassButton } from '../ui/GlassButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SocialButton } from '../ui/SocialButton'
@@ -129,12 +130,23 @@ export function Hero() {
         </motion.div>
       </div>
 
+      {/* live GitHub heatmap — sits under the location line, above About */}
+      <motion.div
+        id="contributions"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: appleEase, delay: 0.9 }}
+        className="container-apple mt-12 scroll-mt-28 md:mt-14"
+      >
+        <GitHubContributions />
+      </motion.div>
+
       {/* stats */}
       <motion.div
         variants={stagger(0.1, 1)}
         initial="hidden"
         animate="show"
-        className="container-apple mt-16 hidden lg:block"
+        className="container-apple mt-6 hidden lg:block"
       >
         <GlassPanel spotlight={false} className="grid grid-cols-4 divide-x divide-black/[0.06] rounded-[18px] dark:divide-white/10">
           {profile.stats.map((s) => (

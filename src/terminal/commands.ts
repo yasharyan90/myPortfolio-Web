@@ -21,7 +21,7 @@ const blank = () => L('')
 const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)]
 const pad = (s: string, n: number) => (s.length >= n ? s : s + ' '.repeat(n - s.length))
 
-export const SECTIONS = ['hero', 'about', 'skills', 'projects', 'coding', 'education', 'certifications', 'contact'] as const
+export const SECTIONS = ['hero', 'contributions', 'about', 'skills', 'projects', 'coding', 'education', 'certifications', 'contact'] as const
 export const PALETTES: TermPalette[] = ['default', 'green', 'amber', 'matrix', 'dracula']
 
 const SITE_URL = 'https://my-portfolio-web-murex.vercel.app'
