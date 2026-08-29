@@ -4,6 +4,7 @@ import { profile } from '../data/profile'
 import { projects } from '../data/projects'
 import { bySocialId, socials } from '../data/socials'
 import { competencies, skillGroups } from '../data/skills'
+import { now, workingOn } from '../data/now'
 import type { Command, CommandResult, Line, TermContext, TermPalette } from './types'
 
 /* ── helpers ─────────────────────────────────────────────────────────── */
@@ -235,8 +236,11 @@ reg('dsa', 'about', 'DSA progress', null, () => [
 reg('status', 'about', 'current availability', null, () => [green(`● ${profile.availability}`), dim('Reply time is usually same-day.')])
 
 reg('now', 'about', "what I'm doing right now", null, () => [
-  L("Building real-time systems, grinding Striver's A2Z sheet, deepening TypeScript."),
-  dim(`Studying: B.Tech CS (Cloud Computing & Automation) · VIT Bhopal · Class of 2028`),
+  green(`${now.location.city}, ${now.location.region}`),
+  ...now.focus.map((f) => L(`${pad(f.label, 10)} ${f.value}`)),
+  L(`${pad('Building', 10)} ${workingOn.map((p) => p.name).join(' · ')}`),
+  blank(),
+  link(`full now page → /now  (updated ${now.updated})`, '/now'),
 ])
 
 reg('location', 'about', 'where I am based', null, () => [green(profile.location), dim('Campus: VIT Bhopal, Madhya Pradesh')])

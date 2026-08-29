@@ -3,9 +3,11 @@ import { Download, Menu, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { profile } from '../../data/profile'
 import { useActiveSection } from '../../hooks/useActiveSection'
+import { Link, useRoute } from '../../hooks/useRoute'
 import { cn } from '../../lib/cn'
 import { appleEase, spring } from '../../lib/motion'
 import { GlassButton } from '../ui/GlassButton'
+import { NowToggle } from '../ui/NowToggle'
 import { TerminalToggle } from '../ui/TerminalToggle'
 import { ThemeToggle } from '../ui/ThemeToggle'
 
@@ -20,7 +22,9 @@ export const NAV_LINKS = [
 
 export function Navbar() {
   const ids = useMemo(() => ['hero', ...NAV_LINKS.map((l) => l.id)], [])
-  const active = useActiveSection(ids)
+  const { path } = useRoute()
+  const sectionActive = useActiveSection(ids)
+  const active = path === '/' ? sectionActive : ''
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const { scrollY } = useScroll()
@@ -41,7 +45,7 @@ export function Navbar() {
           scrolled ? 'h-[52px]' : 'h-[60px]',
         )}
       >
-        <a href="#hero" className="flex items-center gap-2.5 font-display text-[17px] font-semibold tracking-[-0.374px] text-ink">
+        <Link href="/" className="flex items-center gap-2.5 font-display text-[17px] font-semibold tracking-[-0.374px] text-ink">
           <img
             src={profile.avatarSmall}
             alt=""
@@ -50,22 +54,22 @@ export function Navbar() {
             className="h-7 w-7 rounded-[8px] object-cover ring-1 ring-black/10 dark:ring-white/15"
           />
           <span className="hidden sm:inline">{profile.name}</span>
-        </a>
+        </Link>
 
         <ul className="relative hidden items-center gap-1 md:flex">
           {NAV_LINKS.map((l) => {
             const isActive = active === l.id
             return (
               <li key={l.id} className="relative">
-                <a
-                  href={`#${l.id}`}
+                <Link
+                  href={`/#${l.id}`}
                   className={cn(
                     'relative z-10 block rounded-full px-3.5 py-2 text-[13px] tracking-[-0.12px] transition-colors duration-300',
                     isActive ? 'text-on-ink' : 'text-ink-80 hover:text-ink',
                   )}
                 >
                   {l.label}
-                </a>
+                </Link>
                 {isActive && (
                   <motion.span
                     layoutId="nav-pill"
@@ -79,6 +83,7 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <NowToggle />
           <TerminalToggle />
           <ThemeToggle />
           <div className="hidden sm:block">
@@ -107,21 +112,34 @@ export function Navbar() {
             className="glass absolute left-4 right-4 top-[84px] rounded-[18px] p-2 md:hidden"
           >
             {NAV_LINKS.map((l, i) => (
-              <motion.a
+              <motion.div
                 key={l.id}
-                href={`#${l.id}`}
-                onClick={() => setOpen(false)}
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.04 * i, ease: appleEase }}
-                className={cn(
-                  'block rounded-[11px] px-4 py-3 text-[17px] tracking-[-0.374px]',
-                  active === l.id ? 'bg-ink text-on-ink' : 'text-ink hover:bg-white/60 dark:hover:bg-white/10',
-                )}
               >
-                {l.label}
-              </motion.a>
+                <Link
+                  href={`/#${l.id}`}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    'block rounded-[11px] px-4 py-3 text-[17px] tracking-[-0.374px]',
+                    active === l.id ? 'bg-ink text-on-ink' : 'text-ink hover:bg-white/60 dark:hover:bg-white/10',
+                  )}
+                >
+                  {l.label}
+                </Link>
+              </motion.div>
             ))}
+            <Link
+              href="/now"
+              onClick={() => setOpen(false)}
+              className={cn(
+                'block rounded-[11px] px-4 py-3 text-[17px] tracking-[-0.374px]',
+                path === '/now' ? 'bg-ink text-on-ink' : 'text-ink hover:bg-white/60 dark:hover:bg-white/10',
+              )}
+            >
+              Now
+            </Link>
             <a
               href={profile.resume}
               download

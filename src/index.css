@@ -205,3 +205,18 @@
   .gh-calendar svg:hover rect:not(:hover) { opacity: 0.82; }
   .gh-calendar rect:hover { stroke: var(--color-ink); stroke-width: 1px; stroke-opacity: 0.35; }
 }
+
+/* ── Now toggle: inner ring pulses outward when the pointer reaches for it ── */
+@keyframes now-pulse {
+  0%   { transform: scale(0.55); opacity: 0.9; }
+  100% { transform: scale(1.75); opacity: 0; }
+}
+.now-toggle-pulse { transform-origin: 12px 12px; transform: scale(0.55); opacity: 0; transition: opacity 0.2s var(--ease-apple); }
+.now-toggle:hover .now-toggle-pulse,
+.now-toggle:focus-visible .now-toggle-pulse,
+.now-toggle.is-active .now-toggle-pulse {
+  animation: now-pulse 1.6s var(--ease-apple) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .now-toggle-pulse { animation: none !important; opacity: 0.6; transform: scale(1); }
+}

@@ -10,27 +10,36 @@ import { Education } from './components/sections/Education'
 import { Hero } from './components/sections/Hero'
 import { Projects } from './components/sections/Projects'
 import { Skills } from './components/sections/Skills'
+import { NowPage } from './components/pages/NowPage'
 import { Terminal } from './components/terminal/Terminal'
+import { useRoute } from './hooks/useRoute'
 
 /**
  * Section rhythm follows the Apple "pulse": light hero → light → dark tile → light → dark → light → dark → parchment footer.
  * Light sections sit on the fixed drifting-orb backdrop; dark tiles carry their own scoped orbs.
  */
 export default function App() {
+  const { path } = useRoute()
   return (
     <>
       <ScrollProgress />
       <Background tone="light" mode="fixed" />
       <Navbar />
       <main>
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Coding />
-        <Education />
-        <Certifications />
-        <Contact />
+        {path === '/now' ? (
+          <NowPage />
+        ) : (
+          <>
+            <Hero />
+            <About />
+            <Skills />
+            <Projects />
+            <Coding />
+            <Education />
+            <Certifications />
+            <Contact />
+          </>
+        )}
       </main>
       <Footer />
       <Terminal />

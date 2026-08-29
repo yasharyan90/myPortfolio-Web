@@ -9,7 +9,7 @@ import { GlassButton } from '../ui/GlassButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
 
-function ProjectCard({ p, index }: { p: Project; index: number }) {
+export function ProjectCard({ p, index }: { p: Project; index: number }) {
   const flip = index % 2 === 1
   return (
     <motion.article variants={fadeUp}>

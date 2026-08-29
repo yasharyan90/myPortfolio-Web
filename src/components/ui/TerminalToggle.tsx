@@ -22,10 +22,10 @@ export function TerminalToggle({ className }: { className?: string }) {
       transition={spring}
       className={cn(
         'term-toggle group relative grid h-9 w-9 place-items-center overflow-hidden rounded-full border text-ink transition-colors duration-300',
-        'border-black/[0.06] bg-white/60 hover:bg-white',
-        'dark:border-white/10 dark:bg-white/[0.08] dark:hover:bg-white/[0.16]',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-focus',
-        isOpen && 'is-open bg-ink text-on-ink hover:bg-ink dark:bg-ink dark:hover:bg-ink',
+        isOpen
+          ? 'is-open border-transparent bg-ink text-on-ink'
+          : 'border-black/[0.06] bg-white/60 hover:bg-white dark:border-white/10 dark:bg-white/[0.08] dark:hover:bg-white/[0.16]',
         className,
       )}
     >
