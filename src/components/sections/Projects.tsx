@@ -108,7 +108,7 @@ export function Projects() {
           tone="dark"
           eyebrow="Projects"
           title="Built to run in production."
-          subtitle="Streaming, real-time and e-commerce platforms with live payments — designed, shipped and debugged end to end."
+          subtitle="Collaborative editing, streaming, real-time and e-commerce platforms with live payments — designed, shipped and debugged end to end."
         />
         <motion.div variants={stagger(0.15)} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} className="mt-12 space-y-6">
           {projects.map((p, i) => (

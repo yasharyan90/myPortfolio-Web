@@ -148,7 +148,7 @@ reg('projects', 'about', "list projects — then 'project <name>'", null, () => 
   blank(),
   ...projects.map((p) => green(`  ${pad(p.id, 12)} ${p.name} — ${p.subtitle}`)),
   blank(),
-  dim("'project <id>' for details, or just type the id (lumiere, vit-live, aurum, uhip)"),
+  dim("'project <id>' for details, or just type the id (colcode, lumiere, vit-live, aurum, uhip)"),
 ])
 
 reg('project', 'about', 'details for one project', 'project <id>', (args) => {
@@ -158,10 +158,12 @@ reg('project', 'about', 'details for one project', 'project <id>', (args) => {
   return projectLines(p)
 })
 
-reg('lumiere', 'about', 'Lumière — movie streaming platform', null, () => projectLines(projects[0]))
-reg('vit-live', 'about', 'VIT Live — real-time campus platform', null, () => projectLines(projects[1]))
-reg('aurum', 'about', 'Aurum — luxury e-commerce store', null, () => projectLines(projects[2]))
-reg('uhip', 'about', 'UHIP — health intelligence platform', null, () => projectLines(projects[3]))
+const byId = (id: string) => () => projectLines(projects.find((p) => p.id === id)!)
+reg('colcode', 'about', 'ColCode — real-time collaborative code editor', null, byId('colcode'))
+reg('lumiere', 'about', 'Lumière — movie streaming platform', null, byId('lumiere'))
+reg('vit-live', 'about', 'VIT Live — real-time campus platform', null, byId('vit-live'))
+reg('aurum', 'about', 'Aurum — luxury e-commerce store', null, byId('aurum'))
+reg('uhip', 'about', 'UHIP — health intelligence platform', null, byId('uhip'))
 
 reg('experience', 'about', 'hands-on experience', null, () => [
   dim('No 9-to-5 yet — this is what I have actually shipped:'),

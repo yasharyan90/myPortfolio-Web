@@ -24,6 +24,33 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: 'colcode',
+    name: 'ColCode',
+    subtitle: 'Real-Time Collaborative Code Editor',
+    kind: 'Personal project · Production Docker deployment',
+    accent: '#f04a1c',
+    monogram: 'CC',
+    cover: '/projects/colcode.jpg',
+    coverPosition: 'left top',
+    description:
+      'A shared code editor — one project, many cursors, instant sync. Yjs CRDTs and WebSockets merge concurrent edits conflict-free, and each run executes in a single-use, locked-down Docker sandbox without leaving the page.',
+    highlights: [
+      'Real-time collaborative editing on Yjs CRDT + WebSockets — live cursors, selections and user presence with zero lost keystrokes during simultaneous typing.',
+      'Secure code-execution sandbox: every run launches a single-use Docker container with network isolation, read-only root filesystem, dropped capabilities and cgroup CPU, memory, PID and wall-clock limits.',
+      'Runs Python, JavaScript, TypeScript, Ruby and Go with stdout/stderr streamed back into the shared panel in real time.',
+      'GitHub OAuth, JWT sessions and server-side project RBAC (owner / editor / viewer) enforced during WebSocket upgrades; CRDT snapshots persisted to PostgreSQL so project state survives server restarts.',
+      'Load-tested the sync server at 3,500 ops/s across 100 rooms and 500 concurrent clients.',
+      'Shipped 150 automated checks — sync, access control, sandbox limits and Puppeteer browser E2E — plus a production Docker Compose deployment behind Caddy with HTTPS.',
+    ],
+    stack: ['React', 'TypeScript', 'Monaco Editor', 'Yjs (CRDT)', 'WebSockets', 'xterm.js', 'Node.js', 'Fastify', 'PostgreSQL', 'Redis', 'Docker', 'Caddy', 'Puppeteer'],
+    links: [{ label: 'Source on GitHub', href: 'https://github.com/yasharyan90/ColCode', kind: 'github' }],
+    metrics: [
+      { label: 'Sync load', value: '3.5K ops/s' },
+      { label: 'Clients', value: '500' },
+      { label: 'Checks', value: '150' },
+    ],
+  },
+  {
     id: 'lumiere',
     name: 'Lumière',
     subtitle: 'Members-Only Movie Streaming Platform',
