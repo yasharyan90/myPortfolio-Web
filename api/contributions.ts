@@ -1,5 +1,8 @@
 /**
- * GET /api/contributions?user=<github-login>&to=<YYYY-MM-DD in the viewer's timezone>
+ * GET /api/contributions?user=<github-login>&to=<YYYY-MM-DD in the viewer's timezone>[&year=YYYY]
+ *
+ * Without ?year: a rolling window covering the 365 days ending on `to` (GitHub's default view).
+ * With ?year: that calendar year, GitHub-profile style — trimmed to `to` for the current year.
  *
  * Pulls a contribution calendar straight from GitHub's public contributions page (the same page
  * github.com renders on a profile), so the data is as current as GitHub itself.
@@ -48,6 +51,13 @@ export function isValidUsername(u: string | null | undefined): u is string {
   return !!u && USERNAME.test(u)
 }
 
+/** Parse a ?year= value: any calendar year from GitHub's launch (2008) through the current one. */
+export function resolveYear(input: string | null | undefined, to: string): number | undefined {
+  if (!input || !/^\d{4}$/.test(input)) return undefined
+  const y = Number(input)
+  return y >= 2008 && y <= Number(to.slice(0, 4)) ? y : undefined
+}
+
 function attr(tag: string, name: string): string | undefined {
   const m = tag.match(new RegExp(`\\s${name}="([^"]*)"`))
   return m?.[1]
@@ -88,17 +98,25 @@ async function fetchYear(username: string, year: number): Promise<ContributionDa
   return parseContributionsHtml(await res.text())
 }
 
-export async function fetchContributions(username: string, to: string): Promise<ContributionCalendar> {
-  const toDate = new Date(to + 'T00:00:00Z')
-  const fromDate = new Date(toDate)
-  fromDate.setUTCFullYear(fromDate.getUTCFullYear() - 1)
-  fromDate.setUTCDate(fromDate.getUTCDate() + 1)
-  const from = iso(fromDate)
+export async function fetchContributions(username: string, to: string, year?: number): Promise<ContributionCalendar> {
+  let from: string
+  if (year !== undefined) {
+    // GitHub-profile-style single-year view: Jan 1 through Dec 31, trimmed to today for the current year.
+    from = `${year}-01-01`
+    const dec31 = `${year}-12-31`
+    if (to < from || to > dec31) to = dec31
+  } else {
+    const toDate = new Date(to + 'T00:00:00Z')
+    const fromDate = new Date(toDate)
+    fromDate.setUTCFullYear(fromDate.getUTCFullYear() - 1)
+    fromDate.setUTCDate(fromDate.getUTCDate() + 1)
+    from = iso(fromDate)
+  }
 
   // GitHub snaps any from/to window to a single calendar year, so fetch each year the window
   // touches (at most two) and merge — future days come back at level 0 and are trimmed below.
   const years: number[] = []
-  for (let y = fromDate.getUTCFullYear(); y <= toDate.getUTCFullYear(); y++) years.push(y)
+  for (let y = Number(from.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) years.push(y)
   const pages = await Promise.all(years.map((y) => fetchYear(username, y)))
 
   const byDate = new Map<string, ContributionDay>()
@@ -115,10 +133,18 @@ export async function handleContributionsRequest(search: URLSearchParams): Promi
   const user = search.get('user')
   if (!isValidUsername(user)) return { status: 400, body: { error: 'invalid or missing ?user=' }, cache: 'no-store' }
   const to = resolveToDate(search.get('to'))
+  const yearParam = search.get('year')
+  const year = resolveYear(yearParam, to)
+  if (yearParam && year === undefined) return { status: 400, body: { error: 'invalid ?year=' }, cache: 'no-store' }
   try {
-    const calendar = await fetchContributions(user, to)
-    // near-live: shared CDN cache for 60s, serve stale while refreshing for 10 min
-    return { status: 200, body: calendar, cache: 'public, s-maxage=60, stale-while-revalidate=600' }
+    const calendar = await fetchContributions(user, to, year)
+    // a finished past year never changes — cache it for a day; otherwise near-live:
+    // shared CDN cache for 60s, serve stale while refreshing for 10 min
+    const cache =
+      year !== undefined && year < Number(to.slice(0, 4))
+        ? 'public, s-maxage=86400, stale-while-revalidate=604800'
+        : 'public, s-maxage=60, stale-while-revalidate=600'
+    return { status: 200, body: calendar, cache }
   } catch (e) {
     const err = e as Error & { status?: number }
     return { status: err.status ?? 502, body: { error: err.message }, cache: 'no-store' }
