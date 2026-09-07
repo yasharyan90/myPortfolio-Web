@@ -24,6 +24,37 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: 'bintrack',
+    name: 'BinTrack',
+    subtitle: 'Multi-Warehouse Inventory & Location Tracking',
+    kind: 'Personal project · Live on Vercel',
+    accent: '#f5c400',
+    monogram: 'BT',
+    cover: '/projects/bintrack.jpg',
+    coverPosition: 'left top',
+    description:
+      'A warehouse management app that answers "where is it and how many?" in under a second across a Warehouse → Row → Bin hierarchy — scan-verified picking, goods receipt, cycle counts and a live admin dashboard, with every business rule enforced inside Postgres.',
+    highlights: [
+      'Designed a PostgreSQL schema of 27 tables, 75 PL/pgSQL functions, 36 triggers and 60 Row-Level Security policies, so no-oversell, no-negative-stock and no-expired-lot-shipped hold for the app, API and CSV imports alike — no custom backend server.',
+      'FEFO (first-expired-first-out) order allocation as a database function with row locking, so concurrent pickers never reserve the same unit; the pick list is then sorted by walking order.',
+      'Typo-tolerant search over name, SKU and barcode on trigram indexes, returning in 15–20 ms across 800 SKUs.',
+      'Goods Receipt module — purchase order → truck → seal check → scan count → put-away — with partial deliveries, short/excess detection, evidence uploads and an insert-only audit timeline enforced by triggers.',
+      'Deduplicating, auto-resolving alert engine for 8 alert types streamed to the dashboard over Supabase Realtime, plus auto-assignment of tasks to the least-loaded staff member and a performance dashboard computed from real movements.',
+      'Camera barcode/QR and USB scanner input, an IndexedDB offline scan queue and PWA install for the warehouse floor; four Deno Edge Functions (CSV import, alert digest, label PDF, order webhook).',
+      '141/141 pgTAP assertions, 66/66 Vitest tests, 5 Playwright specs, strict TypeScript and zero-warning ESLint, enforced in a three-job GitHub Actions pipeline.',
+    ],
+    stack: ['React 18', 'TypeScript', 'Vite', 'TanStack Query', 'Zustand', 'Zod', 'Tailwind', 'Radix UI', 'Recharts', 'ZXing', 'Supabase', 'PostgreSQL', 'PL/pgSQL', 'pg_trgm', 'pg_cron', 'Deno Edge Functions', 'pgTAP', 'Vitest', 'Playwright', 'PWA', 'Vercel', 'GitHub Actions'],
+    links: [
+      { label: 'Try it live', href: 'https://bin-track-ih61.vercel.app/', kind: 'live' },
+      { label: 'Source on GitHub', href: 'https://github.com/yasharyan90/BinTrack', kind: 'github' },
+    ],
+    metrics: [
+      { label: 'Search', value: '15–20 ms' },
+      { label: 'RLS policies', value: '60' },
+      { label: 'Tests', value: '212' },
+    ],
+  },
+  {
     id: 'colcode',
     name: 'ColCode',
     subtitle: 'Real-Time Collaborative Code Editor',

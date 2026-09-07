@@ -148,7 +148,7 @@ reg('projects', 'about', "list projects — then 'project <name>'", null, () => 
   blank(),
   ...projects.map((p) => green(`  ${pad(p.id, 12)} ${p.name} — ${p.subtitle}`)),
   blank(),
-  dim("'project <id>' for details, or just type the id (colcode, lumiere, vit-live, aurum, uhip)"),
+  dim("'project <id>' for details, or just type the id (bintrack, colcode, lumiere, vit-live, aurum, uhip)"),
 ])
 
 reg('project', 'about', 'details for one project', 'project <id>', (args) => {
@@ -159,6 +159,7 @@ reg('project', 'about', 'details for one project', 'project <id>', (args) => {
 })
 
 const byId = (id: string) => () => projectLines(projects.find((p) => p.id === id)!)
+reg('bintrack', 'about', 'BinTrack — multi-warehouse inventory tracking', null, byId('bintrack'))
 reg('colcode', 'about', 'ColCode — real-time collaborative code editor', null, byId('colcode'))
 reg('lumiere', 'about', 'Lumière — movie streaming platform', null, byId('lumiere'))
 reg('vit-live', 'about', 'VIT Live — real-time campus platform', null, byId('vit-live'))

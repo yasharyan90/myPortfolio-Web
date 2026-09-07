@@ -7,7 +7,7 @@ import { profile } from './profile'
  * Update `updated` whenever you change anything here.
  */
 export const now = {
-  updated: '2026-08-30',
+  updated: '2026-09-07',
   timezone: 'Asia/Kolkata',
   timezoneLabel: 'IST',
 
@@ -25,7 +25,7 @@ export const now = {
   ],
 
   /** ids from projects.ts that are actively in progress right now, newest first */
-  workingOnIds: ['colcode', 'lumiere'],
+  workingOnIds: ['bintrack', 'colcode', 'lumiere'],
 }
 
 /** This site itself — shown alongside the in-progress projects, in the same card template. */
