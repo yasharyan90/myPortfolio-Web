@@ -197,6 +197,19 @@
 
 /* ── GitHub contribution calendar (react-github-calendar) ─────────────── */
 @layer components {
+  /* darker inner well behind the heatmap so the green cells stand out from the glass */
+  .gh-well {
+    padding: 14px 16px 10px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.045);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+  .dark .gh-well {
+    background: rgba(0, 0, 0, 0.42);
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
   .gh-calendar .react-activity-calendar { width: 100%; }
   .gh-calendar .react-activity-calendar__scroll-container { padding-bottom: 4px; scrollbar-width: thin; }
   .gh-calendar .react-activity-calendar__footer { color: var(--color-ink-48); font-size: 12px; letter-spacing: -0.12px; }

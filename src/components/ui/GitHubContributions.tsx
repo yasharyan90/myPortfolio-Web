@@ -11,7 +11,7 @@ import { GlassPanel } from './GlassPanel'
 /** GitHub's own contribution scales, so the graph reads exactly like the one on github.com */
 const THEME = {
   light: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
-  dark: ['#1f1f22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+  dark: ['#1a1a1d', '#0e4429', '#006d32', '#26a641', '#39d353'],
 }
 
 const REFRESH_MS = 5 * 60 * 1000
@@ -157,7 +157,7 @@ export function GitHubContributions() {
         ))}
       </div>
 
-      <div ref={wrap} className="gh-calendar mt-5 text-ink-48">
+      <div ref={wrap} className="gh-calendar gh-well mt-5 text-ink-48">
         {state.status === 'error' ? (
           <p className="text-[14px] text-ink-48">
             Couldn't reach GitHub right now —{' '}
