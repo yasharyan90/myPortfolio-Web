@@ -240,7 +240,11 @@ export function Terminal() {
       }
     } else if (e.key === 'Tab') {
       e.preventDefault()
-      complete()
+      if (!input && sessionCount === 0) setInput('help')
+      else complete()
+    } else if (e.key === 'ArrowRight' && !input && sessionCount === 0) {
+      e.preventDefault()
+      setInput('help')
     } else if ((e.key === 'l' || e.key === 'L') && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       setRows([])
@@ -389,7 +393,8 @@ export function Terminal() {
                     autoCorrect="off"
                     enterKeyHint="send"
                     aria-label="Terminal command"
-                    className="min-w-0 flex-1 bg-transparent font-mono text-[13.5px] text-[var(--t-text)] caret-[var(--t-green)] outline-none"
+                    placeholder={sessionCount === 0 ? 'help' : undefined}
+                    className="min-w-0 flex-1 bg-transparent font-mono text-[13.5px] text-[var(--t-text)] caret-[var(--t-green)] outline-none placeholder:text-[var(--t-dim)] placeholder:opacity-50 placeholder:blur-[0.4px]"
                   />
                 </div>
               </div>
