@@ -40,7 +40,7 @@ export function GlassPanel({ tone = 'light', spotlight = true, className, childr
       {spotlight && (
         <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-0" style={{ background: glow }} />
       )}
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 h-full">{children}</div>
     </motion.div>
   )
 }
