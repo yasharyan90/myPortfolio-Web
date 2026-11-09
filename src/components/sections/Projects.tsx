@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, ExternalLink } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type UIEvent } from 'react'
 import { SiGithub } from 'react-icons/si'
 import { projects, type Project } from '../../data/projects'
+import { SHOW_PROJECT_EVENT } from '../../lib/skillUsage'
 import { appleEase, fadeUp, stagger } from '../../lib/motion'
 import { cn } from '../../lib/cn'
 import { Background } from '../layout/Background'
@@ -225,6 +226,20 @@ function Controls({ active, total, progress, onPrev, onNext }: ControlsProps) {
 /* ── Desktop: pinned section, vertical scroll drives the track sideways ──── */
 
 const GAP = 24
+
+/** Subscribe to cross-section "show this project" requests (fired from the Skills panel). */
+function useShowProject(handler: (index: number) => void) {
+  const ref = useRef(handler)
+  ref.current = handler
+  useEffect(() => {
+    const onShow = (e: Event) => {
+      const i = projects.findIndex((p) => p.id === (e as CustomEvent<string>).detail)
+      if (i >= 0) ref.current(i)
+    }
+    window.addEventListener(SHOW_PROJECT_EVENT, onShow)
+    return () => window.removeEventListener(SHOW_PROJECT_EVENT, onShow)
+  }, [])
+}
 const MAX_CARD = 1056 // .container-apple (1120) minus its 2rem gutters
 
 function useMediaQuery(query: string) {
@@ -277,6 +292,8 @@ function PinnedProjects() {
     const range = wrap.offsetHeight - window.innerHeight
     window.scrollTo({ top: top + (n > 1 ? target / (n - 1) : 0) * range, behavior: 'smooth' })
   }
+
+  useShowProject(goTo)
 
   // keyboard users tabbing into an off-stage card: bring it on
   const onFocus = (e: FocusEvent<HTMLDivElement>) => {
@@ -364,6 +381,11 @@ function SwipeProjects() {
     const slide = el?.querySelectorAll<HTMLElement>('[data-slide]')[Math.max(0, Math.min(n - 1, i))]
     slide?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
   }
+
+  useShowProject((i) => {
+    const slide = trackRef.current?.querySelectorAll<HTMLElement>('[data-slide]')[i]
+    slide?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'center' })
+  })
 
   return (
     <div className="section relative">
