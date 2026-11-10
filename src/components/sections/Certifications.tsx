@@ -18,11 +18,11 @@ const ALL = 'All'
 const PLATFORM_COLOR: Record<string, string> = { NPTEL: '#e4572e', Coursera: '#0056d2' }
 
 function scoreOf(c: Certification): number | null {
-  const m = c.badge?.match(/(\d{1,3})\s*%/)
+  const m = c.badge?.match(/(\d{1,3}(?:\.\d+)?)\s*%/)
   return m ? Number(m[1]) : null
 }
 function tierOf(c: Certification): string | null {
-  const t = c.badge?.replace(/·?\s*\d{1,3}\s*%/, '').replace(/·/g, '').trim()
+  const t = c.badge?.replace(/·?\s*\d{1,3}(?:\.\d+)?\s*%/, '').replace(/·/g, '').trim()
   return t || null
 }
 
@@ -44,15 +44,16 @@ function achievementTarget(text: string): { href?: string; project?: string } {
 function ScoreRing({ score, color }: { score: number; color: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-10% 0px' })
-  const r = 20
+  const r = 22
   const c = 2 * Math.PI * r
+  const decimals = Number.isInteger(score) ? 0 : 2
   return (
-    <div ref={ref} className="relative h-[52px] w-[52px] shrink-0" title={`${score}% final score`}>
-      <svg viewBox="0 0 52 52" className="h-full w-full -rotate-90">
-        <circle cx="26" cy="26" r={r} fill="none" stroke="currentColor" strokeWidth="4" className="text-black/[0.06] dark:text-white/10" />
+    <div ref={ref} className="relative h-[56px] w-[56px] shrink-0" title={`${score}% final score`}>
+      <svg viewBox="0 0 56 56" className="h-full w-full -rotate-90">
+        <circle cx="28" cy="28" r={r} fill="none" stroke="currentColor" strokeWidth="4" className="text-black/[0.06] dark:text-white/10" />
         <motion.circle
-          cx="26"
-          cy="26"
+          cx="28"
+          cy="28"
           r={r}
           fill="none"
           stroke={color}
@@ -64,8 +65,8 @@ function ScoreRing({ score, color }: { score: number; color: string }) {
           transition={{ duration: 1.4, ease: appleEase, delay: 0.2 }}
         />
       </svg>
-      <span className="absolute inset-0 grid place-items-center font-display text-[12.5px] font-semibold tabular-nums text-ink">
-        {inView ? <CountUp value={score} suffix="%" /> : '0%'}
+      <span className={cn('absolute inset-0 grid place-items-center font-display font-semibold tabular-nums text-ink', decimals ? 'text-[10.5px]' : 'text-[12.5px]')}>
+        {inView ? <CountUp value={score} suffix="%" decimals={decimals} /> : '0%'}
       </span>
     </div>
   )
@@ -180,7 +181,7 @@ export function Certifications() {
   const stats = [
     { value: certifications.length, label: 'certifications', suffix: '' },
     { value: issuers, label: 'institutions', suffix: '' },
-    ...(avgScore != null ? [{ value: avgScore, label: 'avg. NPTEL score', suffix: '%' }] : []),
+    ...(avgScore != null ? [{ value: avgScore, label: 'avg. score', suffix: '%' }] : []),
   ]
 
   return (

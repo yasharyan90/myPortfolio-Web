@@ -13,6 +13,7 @@ export const certifications: Certification[] = [
     title: 'Applied Machine Learning in Python',
     issuer: 'University of Michigan',
     platform: 'Coursera',
+    badge: '88.96%',
     topics: ['Predictive Modeling', 'Scikit-Learn', 'Data Preprocessing'],
     credentialUrl: 'https://coursera.org/share/06993bcdf7ec51976f18565dc831fde4',
   },
