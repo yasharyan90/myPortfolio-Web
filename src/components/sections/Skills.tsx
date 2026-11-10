@@ -1,10 +1,10 @@
 import { AnimatePresence, LayoutGroup, motion, MotionConfig } from 'framer-motion'
 import { ArrowUpRight, MousePointerClick } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { competencies, skillGroups } from '../../data/skills'
 import { cn } from '../../lib/cn'
 import { appleEase, fadeUp, spring, stagger, viewport } from '../../lib/motion'
-import { pairedWith, showProject, skillEntries, type SkillEntry } from '../../lib/skillUsage'
+import { pairedWith, SHOW_SKILL_EVENT, showProject, skillEntries, type SkillEntry } from '../../lib/skillUsage'
 import { Chip } from '../ui/Chip'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
@@ -35,6 +35,7 @@ function Tile({ entry, selected, onPeek, onPick }: TileProps) {
       whileHover={{ y: -3 }}
       whileTap={{ scale: 0.97 }}
       onMouseEnter={() => onPeek(entry)}
+      onMouseMove={() => onPeek(entry)}
       onMouseLeave={() => onPeek(null)}
       onFocus={() => onPeek(entry)}
       onBlur={() => onPeek(null)}
@@ -183,8 +184,30 @@ export function Skills() {
   const [pinned, setPinned] = useState<SkillEntry | null>(null)
   const [peek, setPeek] = useState<SkillEntry | null>(null)
   const panelRef = useRef<HTMLElement>(null)
+  // after a programmatic jump the tile that lands under a still cursor must not steal the panel
+  const peekLocked = useRef(false)
+  const peekIfFree = (e: SkillEntry | null) => {
+    if (peekLocked.current) return
+    setPeek(e)
+  }
 
   const shown = useMemo(() => (filter === ALL ? skillEntries : skillEntries.filter((e) => e.group === filter)), [filter])
+
+  // other sections (About's linked keywords) can ask for a skill to be pinned and brought into view
+  useEffect(() => {
+    const onShow = (e: Event) => {
+      const entry = skillEntries.find((x) => x.skill.name === (e as CustomEvent<string>).detail)
+      if (!entry) return
+      setFilter(ALL)
+      setPeek(null)
+      setPinned(entry)
+      peekLocked.current = true
+      window.addEventListener('mousemove', () => (peekLocked.current = false), { once: true })
+      document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+    window.addEventListener(SHOW_SKILL_EVENT, onShow)
+    return () => window.removeEventListener(SHOW_SKILL_EVENT, onShow)
+  }, [])
   const current = peek ?? pinned
 
   const tabs = [
@@ -268,7 +291,7 @@ export function Skills() {
           >
             <AnimatePresence mode="popLayout" initial={false}>
               {shown.map((e) => (
-                <Tile key={e.skill.name} entry={e} selected={pinned?.skill.name === e.skill.name} onPeek={setPeek} onPick={pick} />
+                <Tile key={e.skill.name} entry={e} selected={pinned?.skill.name === e.skill.name} onPeek={peekIfFree} onPick={pick} />
               ))}
             </AnimatePresence>
           </motion.div>

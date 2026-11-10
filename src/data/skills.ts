@@ -119,7 +119,7 @@ export const skillGroups: SkillGroup[] = [
     title: 'Cloud & DevOps',
     description: 'From laptop to production.',
     items: [
-      { name: 'AWS EC2', icon: FaAws, color: '#FF9900' },
+      { name: 'AWS EC2', icon: FaAws, color: '#FF9900', aliases: ['aws'] },
       { name: 'AWS S3', icon: FaAws, color: '#FF9900', aliases: ['s3-compatible'] },
       { name: 'Cloudflare CDN', icon: SiCloudflare, color: '#F38020' },
       { name: 'Docker', icon: SiDocker, color: '#2496ED' },

@@ -71,3 +71,16 @@ export const SHOW_PROJECT_EVENT = 'portfolio:show-project'
 export function showProject(id: string) {
   window.dispatchEvent(new CustomEvent(SHOW_PROJECT_EVENT, { detail: id }))
 }
+
+export const SHOW_SKILL_EVENT = 'portfolio:show-skill'
+
+/** Ask the Skills section to pin a skill and scroll to it (fired from auto-linked terms in About). */
+export function showSkill(name: string) {
+  window.dispatchEvent(new CustomEvent(SHOW_SKILL_EVENT, { detail: name }))
+}
+
+/** Longest-first list of every skill name + alias, for highlighting mentions in prose. */
+export function findSkillByTerm(term: string): SkillEntry | undefined {
+  const t = normalizeTech(term)
+  return skillEntries.find((e) => normalizeTech(e.skill.name) === t) ?? skillEntries.find((e) => (e.skill.aliases ?? []).some((a) => normalizeTech(a) === t))
+}
