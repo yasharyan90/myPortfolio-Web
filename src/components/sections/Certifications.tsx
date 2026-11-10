@@ -1,5 +1,5 @@
 import { AnimatePresence, LayoutGroup, motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
-import { ArrowUpRight, Award, GraduationCap, Sparkles } from 'lucide-react'
+import { ArrowUpRight, Award, BadgeCheck, GraduationCap, Sparkles } from 'lucide-react'
 import { useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { achievements, certifications, type Certification } from '../../data/certifications'
 import { Link } from '../../hooks/useRoute'
@@ -8,6 +8,7 @@ import { appleEase, fadeUp, spring, stagger, viewport } from '../../lib/motion'
 import { showProject } from '../../lib/skillUsage'
 import { Chip } from '../ui/Chip'
 import { CountUp } from '../ui/CountUp'
+import { GlassButton } from '../ui/GlassButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
 
@@ -143,11 +144,28 @@ function CertCard({ c }: { c: Certification }) {
           </span>
           {tier && <span className="rounded-full bg-ink px-2.5 py-1 text-[12px] font-semibold text-on-ink">{tier}</span>}
         </div>
-        <motion.div variants={stagger(0.04)} initial="hidden" animate="show" className="relative z-10 mt-auto flex flex-wrap gap-2 pt-5">
+        <motion.div variants={stagger(0.04)} initial="hidden" animate="show" className="relative z-10 flex flex-wrap gap-2 pt-5">
           {c.topics.map((t) => (
             <Chip key={t}>{t}</Chip>
           ))}
         </motion.div>
+        {c.credentialUrl && (
+          <div className="relative z-10 mt-auto pt-5">
+            <GlassButton
+              href={c.credentialUrl}
+              external
+              variant="glass"
+              size="sm"
+              magnetic={false}
+              icon={<BadgeCheck className="h-3.5 w-3.5" style={{ color }} />}
+              iconRight={<ArrowUpRight className="h-3.5 w-3.5" />}
+              ariaLabel={`View the ${c.title} certificate on ${c.platform}`}
+              className="w-full justify-between"
+            >
+              View certificate
+            </GlassButton>
+          </div>
+        )}
       </TiltCard>
     </motion.div>
   )

@@ -4,6 +4,8 @@ export interface Certification {
   platform: string
   badge?: string
   topics: string[]
+  /** public verification page for the certificate */
+  credentialUrl?: string
 }
 
 export const certifications: Certification[] = [
@@ -12,6 +14,7 @@ export const certifications: Certification[] = [
     issuer: 'University of Michigan',
     platform: 'Coursera',
     topics: ['Predictive Modeling', 'Scikit-Learn', 'Data Preprocessing'],
+    credentialUrl: 'https://coursera.org/share/06993bcdf7ec51976f18565dc831fde4',
   },
   {
     title: 'Cloud Computing and Distributed Systems',
@@ -19,6 +22,7 @@ export const certifications: Certification[] = [
     platform: 'NPTEL',
     badge: 'Elite + Silver · 78%',
     topics: ['Virtualization', 'Scalability', 'Distributed Systems'],
+    credentialUrl: 'https://nptel.ac.in/noc/E_Certificate/NOC26CS29S55280041703130440',
   },
   {
     title: 'Introduction to Internet of Things',
@@ -26,6 +30,7 @@ export const certifications: Certification[] = [
     platform: 'NPTEL',
     badge: 'Elite · 77%',
     topics: ['IoT Architecture', 'Embedded Systems', 'Protocols'],
+    credentialUrl: 'https://nptel.ac.in/noc/E_Certificate/NPTEL25CS147S95840145010990718',
   },
   {
     title: 'Big Data Computing',
@@ -33,6 +38,7 @@ export const certifications: Certification[] = [
     platform: 'NPTEL',
     badge: '70%',
     topics: ['Hadoop & MapReduce', 'Apache Spark', 'NoSQL Stores'],
+    credentialUrl: 'https://nptel.ac.in/verify/NOC-6GRT-CV4H-VZ5GZ',
   },
 ]
 
