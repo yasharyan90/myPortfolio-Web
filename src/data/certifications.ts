@@ -27,6 +27,13 @@ export const certifications: Certification[] = [
     badge: 'Elite · 77%',
     topics: ['IoT Architecture', 'Embedded Systems', 'Protocols'],
   },
+  {
+    title: 'Big Data Computing',
+    issuer: 'IIT Kanpur',
+    platform: 'NPTEL',
+    badge: '70%',
+    topics: ['Hadoop & MapReduce', 'Apache Spark', 'NoSQL Stores'],
+  },
 ]
 
 export const achievements = [

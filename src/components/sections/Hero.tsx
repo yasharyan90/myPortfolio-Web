@@ -269,7 +269,8 @@ export function Hero() {
 
       {/* stats — each tile leads to where the number comes from */}
       <motion.div variants={stagger(0.1, 1)} initial="hidden" animate="show" className="container-apple mt-6 hidden lg:block">
-        <GlassPanel spotlight={false} className="grid grid-cols-4 divide-x divide-black/[0.06] rounded-[18px] dark:divide-white/10">
+        <GlassPanel spotlight={false} className="rounded-[18px]">
+          <div className="grid grid-cols-4 divide-x divide-black/[0.06] dark:divide-white/10">
           {profile.stats.map((s) => {
             const t = statTarget(s.label)
             const inner = (
@@ -277,14 +278,14 @@ export function Hero() {
                 <p className="font-display text-[28px] font-semibold leading-none tracking-[-0.01em] text-ink">
                   <CountUp value={s.value} suffix={s.suffix} decimals={s.decimals ?? 0} />
                 </p>
-                <p className="mt-1.5 flex items-center justify-between gap-2 text-[13px] tracking-[-0.2px] text-ink-48">
-                  {s.label}
-                  <span className="text-[12px] text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">{t.hint} →</span>
-                </p>
+                <p className="mt-1.5 text-[13px] tracking-[-0.2px] text-ink-48">{s.label}</p>
+                <span className="pointer-events-none absolute right-4 top-3 text-[11.5px] text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {t.hint} →
+                </span>
               </>
             )
             const cls = cn(
-              'group block w-full px-6 py-4 text-left transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.04]',
+              'group relative block w-full px-6 py-4 text-left transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.04]',
               'first:rounded-l-[18px] last:rounded-r-[18px] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary-focus',
             )
             return (
@@ -301,6 +302,7 @@ export function Hero() {
               </motion.div>
             )
           })}
+          </div>
         </GlassPanel>
       </motion.div>
 
