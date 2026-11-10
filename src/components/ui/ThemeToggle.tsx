@@ -12,7 +12,6 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={toggle}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       aria-pressed={isDark}
-      title={isDark ? 'Light mode' : 'Dark mode'}
       whileHover={{ scale: 1.06 }}
       whileTap={{ scale: 0.9 }}
       transition={spring}

@@ -16,7 +16,6 @@ export function NowToggle({ className }: { className?: string }) {
       onClick={() => navigate(active ? '/' : '/now')}
       aria-label={active ? 'Back to home' : 'What I’m doing now'}
       aria-pressed={active}
-      title="Now"
       initial="rest"
       whileHover="hover"
       whileTap={{ scale: 0.9 }}

@@ -15,7 +15,6 @@ export function TerminalToggle({ className }: { className?: string }) {
       onClick={toggle}
       aria-label={isOpen ? 'Close terminal' : 'Open terminal'}
       aria-pressed={isOpen}
-      title="Terminal (⌘K)"
       initial="rest"
       whileHover="hover"
       whileTap={{ scale: 0.9 }}
