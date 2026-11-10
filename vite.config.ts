@@ -30,6 +30,18 @@ function devApi(): Plugin {
   }
 }
 
+// no @types/node in this project — the slice of `process` we read
+declare const process: { env: Record<string, string | undefined> }
+
+/** Vercel exposes the deployed commit at build time; locally there is none, so the footer says "dev". */
+const sha = process.env.VERCEL_GIT_COMMIT_SHA ?? ''
+const buildInfo = {
+  __COMMIT_SHA__: JSON.stringify(sha ? sha.slice(0, 7) : 'dev'),
+  __COMMIT_MESSAGE__: JSON.stringify((process.env.VERCEL_GIT_COMMIT_MESSAGE ?? '').split('\n')[0]),
+  __BUILT_AT__: JSON.stringify(new Date().toISOString()),
+}
+
 export default defineConfig({
   plugins: [react(), tailwindcss(), devApi()],
+  define: buildInfo,
 })
