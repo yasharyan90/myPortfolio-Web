@@ -66,16 +66,50 @@ export function pairedWith(entry: SkillEntry, limit = 4): SkillEntry[] {
 }
 
 export const SHOW_PROJECT_EVENT = 'portfolio:show-project'
+export const PENDING_PROJECT_KEY = 'pending-project'
 
-/** Ask the Projects section to bring a card on stage (works in pinned and swipe modes). */
+/**
+ * If the home page isn't mounted (we're on /now), remember the request, route home through the
+ * tiny router (pushState + popstate) and let the section consume it once it mounts.
+ */
+function goHomeWith(key: string, value: string, hash: string) {
+  try {
+    sessionStorage.setItem(key, value)
+  } catch {
+    /* ignore */
+  }
+  window.history.pushState(null, '', `/#${hash}`)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+}
+
+/** Peek at a request left behind by goHomeWith; clear it only once it has actually been acted on. */
+export function readPending(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+export function clearPending(key: string) {
+  try {
+    sessionStorage.removeItem(key)
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Ask the Projects section to bring a card on stage (works in pinned and swipe modes, from any route). */
 export function showProject(id: string) {
+  if (!document.getElementById('projects')) return goHomeWith(PENDING_PROJECT_KEY, id, 'projects')
   window.dispatchEvent(new CustomEvent(SHOW_PROJECT_EVENT, { detail: id }))
 }
 
 export const SHOW_SKILL_EVENT = 'portfolio:show-skill'
+export const PENDING_SKILL_KEY = 'pending-skill'
 
-/** Ask the Skills section to pin a skill and scroll to it (fired from auto-linked terms in About). */
+/** Ask the Skills section to pin a skill and scroll to it (from any route). */
 export function showSkill(name: string) {
+  if (!document.getElementById('skills')) return goHomeWith(PENDING_SKILL_KEY, name, 'skills')
   window.dispatchEvent(new CustomEvent(SHOW_SKILL_EVENT, { detail: name }))
 }
 

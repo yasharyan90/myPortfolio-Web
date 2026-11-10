@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, ExternalLink } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type UIEvent } from 'react'
 import { SiGithub } from 'react-icons/si'
 import { projects, type Project } from '../../data/projects'
-import { SHOW_PROJECT_EVENT } from '../../lib/skillUsage'
+import { clearPending, PENDING_PROJECT_KEY, readPending, SHOW_PROJECT_EVENT } from '../../lib/skillUsage'
 import { appleEase, fadeUp, stagger } from '../../lib/motion'
 import { cn } from '../../lib/cn'
 import { Background } from '../layout/Background'
@@ -237,7 +237,19 @@ function useShowProject(handler: (index: number) => void) {
       if (i >= 0) ref.current(i)
     }
     window.addEventListener(SHOW_PROJECT_EVENT, onShow)
-    return () => window.removeEventListener(SHOW_PROJECT_EVENT, onShow)
+    const pending = readPending(PENDING_PROJECT_KEY)
+    const i = pending ? projects.findIndex((p) => p.id === pending) : -1
+    const t =
+      i >= 0
+        ? window.setTimeout(() => {
+            clearPending(PENDING_PROJECT_KEY)
+            ref.current(i)
+          }, 350)
+        : 0
+    return () => {
+      window.removeEventListener(SHOW_PROJECT_EVENT, onShow)
+      window.clearTimeout(t)
+    }
   }, [])
 }
 const MAX_CARD = 1056 // .container-apple (1120) minus its 2rem gutters

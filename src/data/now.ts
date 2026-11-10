@@ -14,6 +14,8 @@ export const now = {
   location: {
     city: 'Prayagraj',
     region: 'Uttar Pradesh, India',
+    /** for the live weather readout (open-meteo) */
+    coords: { lat: 25.4358, lon: 81.8463 },
     note: 'Home for the semester break — back on campus at VIT Bhopal for the next term.',
     campus: 'VIT Bhopal · B.Tech CS (Cloud Computing & Automation) · Class of 2028',
   },

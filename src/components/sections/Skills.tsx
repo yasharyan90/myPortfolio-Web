@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { competencies, skillGroups } from '../../data/skills'
 import { cn } from '../../lib/cn'
 import { appleEase, fadeUp, spring, stagger, viewport } from '../../lib/motion'
-import { pairedWith, SHOW_SKILL_EVENT, showProject, skillEntries, type SkillEntry } from '../../lib/skillUsage'
+import { clearPending, pairedWith, PENDING_SKILL_KEY, readPending, SHOW_SKILL_EVENT, showProject, skillEntries, type SkillEntry } from '../../lib/skillUsage'
 import { Chip } from '../ui/Chip'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
@@ -206,7 +206,19 @@ export function Skills() {
       document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
     window.addEventListener(SHOW_SKILL_EVENT, onShow)
-    return () => window.removeEventListener(SHOW_SKILL_EVENT, onShow)
+    // a request made from another route (e.g. /now) before this section existed
+    // (read now, clear when acted on — dev-mode effect double-runs would otherwise swallow it)
+    const pending = readPending(PENDING_SKILL_KEY)
+    const t = pending
+      ? window.setTimeout(() => {
+          clearPending(PENDING_SKILL_KEY)
+          onShow(new CustomEvent(SHOW_SKILL_EVENT, { detail: pending }))
+        }, 350)
+      : 0
+    return () => {
+      window.removeEventListener(SHOW_SKILL_EVENT, onShow)
+      window.clearTimeout(t)
+    }
   }, [])
   const current = peek ?? pinned
 
