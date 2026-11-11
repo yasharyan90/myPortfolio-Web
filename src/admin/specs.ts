@@ -131,6 +131,7 @@ export const SPECS: Record<Section, SectionSpec> = {
             itemLabel: (s) => String(s.name || 'skill'),
             newItem: () => ({ name: '', icon: 'TbCode', aliases: [] }),
             noun: 'skill',
+            collapsed: true,
           },
         ],
         itemLabel: (g) => String(g.title || 'group'),
