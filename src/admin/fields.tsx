@@ -123,11 +123,11 @@ export function Field({ spec, value, onChange, backend, path }: FieldProps) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
-  const upload = async (file: File, folder: string) => {
+  const upload = async (file: File, folder: string, fixedName?: string) => {
     setBusy(true)
     setErr(null)
     try {
-      const url = await backend.upload(`${folder}/${Date.now()}-${safeName(file.name)}`, file)
+      const url = await backend.upload(`${folder}/${fixedName ?? `${Date.now()}-${safeName(file.name)}`}`, file)
       onChange(url)
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'upload failed')
@@ -221,7 +221,7 @@ export function Field({ spec, value, onChange, backend, path }: FieldProps) {
             <div className="min-w-0 flex-1">
               <input id={id} value={v} placeholder={spec.kind === 'image' ? '/path.jpg or https://…' : 'https://…/file.pdf'} onChange={(e) => onChange(e.target.value || undefined)} className={cn(inputCls, 'font-mono text-[12.5px]')} />
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <UploadButton accept={spec.accept ?? (spec.kind === 'image' ? 'image/*' : undefined)} busy={busy} onFile={(f) => void upload(f, spec.uploadPath ?? 'uploads')} />
+                <UploadButton accept={spec.accept ?? (spec.kind === 'image' ? 'image/*' : undefined)} busy={busy} onFile={(f) => void upload(f, spec.uploadPath ?? 'uploads', spec.fixedName)} />
                 {v && spec.kind === 'file' && (
                   <a href={v} target="_blank" rel="noopener noreferrer" className="text-[12.5px] text-primary hover:underline">
                     Open current file

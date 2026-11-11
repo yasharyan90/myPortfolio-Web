@@ -4,7 +4,7 @@ import type { ContentDoc, Section } from './types'
 /** Shared bits */
 const hex = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, 'Use a hex colour like #0066cc')
 const url = z.string().url('Must be a full URL, e.g. https://…')
-const pathOrUrl = z.string().min(1).refine((v) => v.startsWith('/') || /^https?:\/\//.test(v), 'Use a site path (/x) or a full URL')
+const pathOrUrl = z.string().min(1).refine((v) => v.startsWith('/') || /^https?:\/\//.test(v) || v.startsWith('data:'), 'Use a site path (/x) or a full URL')
 const nonEmpty = z.string().trim().min(1, 'Required')
 
 export const profileSchema = z.object({

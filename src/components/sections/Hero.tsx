@@ -14,6 +14,7 @@ import { SocialButton } from '../ui/SocialButton'
 import { Tooltip } from '../ui/Tooltip'
 import { profile, socials } from '../../content/live'
 import { useContent } from '../../content/ContentProvider'
+import { resumeDownloadUrl, resumeFileName } from '../../content/resume'
 
 /** Floating chips around the portrait — each opens its skill in the Skills section. */
 const floatingChips = [
@@ -142,7 +143,7 @@ export function Hero() {
             <GlassButton onClick={() => navigate(profile.resume)} variant="glass" icon={<FileText className="h-4 w-4" />}>
               View résumé
             </GlassButton>
-            <GlassButton href={profile.resumePdf} download variant="glass" icon={<Download className="h-4 w-4" />} ariaLabel="Download résumé PDF">
+            <GlassButton href={resumeDownloadUrl(profile)} download={resumeFileName(profile)} variant="glass" icon={<Download className="h-4 w-4" />} ariaLabel="Download résumé PDF">
               Download PDF
             </GlassButton>
           </motion.div>

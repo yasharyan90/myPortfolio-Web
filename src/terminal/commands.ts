@@ -1,3 +1,4 @@
+import { resumeDownloadAbsolute } from '../content/resume'
 import type { Command, CommandResult, Line, TermContext, TermPalette } from './types'
 import { achievements, certifications, education, profile, projects, bySocialId, socials, competencies, skillGroups, now, workingOn } from '../content/live'
 
@@ -209,8 +210,8 @@ reg('resume', 'about', 'open my résumé (generated live, save as PDF)', null, (
   return [cyan(`opening résumé → ${profile.resume}`), dim("generated from this site's data · 'cv' downloads the original PDF")]
 })
 reg('cv', 'about', 'download the original résumé PDF', null, (_a, ctx) => {
-  ctx.openUrl(`${SITE_URL}${profile.resumePdf}`)
-  return [cyan(`downloading → ${profile.resumePdf}`), dim("'resume' opens the live, always-current version")]
+  ctx.openUrl(resumeDownloadAbsolute(profile, SITE_URL))
+  return [cyan('downloading the résumé PDF'), dim("'resume' opens the live, always-current version")]
 })
 
 reg('contact', 'about', 'how to reach me', null, () => [

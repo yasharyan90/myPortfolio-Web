@@ -5,7 +5,7 @@ import type { Section } from '../content/types'
  * pickers and uploaders; the Zod schemas in content/schema.ts do the validation.
  */
 export type FieldSpec =
-  | { kind: 'text' | 'textarea' | 'number' | 'color' | 'icon' | 'date' | 'url' | 'image' | 'file'; key: string; label: string; help?: string; placeholder?: string; accept?: string; uploadPath?: string; optional?: boolean }
+  | { kind: 'text' | 'textarea' | 'number' | 'color' | 'icon' | 'date' | 'url' | 'image' | 'file'; key: string; label: string; help?: string; placeholder?: string; accept?: string; uploadPath?: string; /** upload under this exact name (replaces the previous file) */ fixedName?: string; optional?: boolean }
   | { kind: 'select'; key: string; label: string; options: string[]; help?: string }
   | { kind: 'strings'; key: string; label: string; help?: string; placeholder?: string }
   | { kind: 'list'; key: string; label: string; help?: string; fields: FieldSpec[]; itemLabel: (item: Record<string, unknown>, i: number) => string; newItem: () => Record<string, unknown>; collapsed?: boolean }
@@ -75,7 +75,7 @@ export const SPECS: Record<Section, SectionSpec> = {
       { kind: 'text', key: 'phone', label: 'Phone' },
       { kind: 'image', key: 'avatar', label: 'Portrait', uploadPath: 'profile' },
       { kind: 'image', key: 'avatarSmall', label: 'Small avatar', uploadPath: 'profile', help: 'navbar and footer' },
-      { kind: 'file', key: 'resumePdf', label: 'Résumé PDF', accept: 'application/pdf', uploadPath: 'resume', help: 'every "Download PDF" button serves this file' },
+      { kind: 'file', key: 'resumePdf', label: 'Résumé PDF', accept: 'application/pdf', uploadPath: 'resume', fixedName: 'resume.pdf', help: 'every "Download PDF" button serves this file — the Résumé PDF panel does this in one step' },
       {
         kind: 'list',
         key: 'stats',

@@ -6,6 +6,7 @@ import { fadeUp, stagger } from '../../lib/motion'
 import { GlassButton } from '../ui/GlassButton'
 import { achievements, certifications, education, profile, projects, competencies, skillGroups, socials } from '../../content/live'
 import { useContent } from '../../content/ContentProvider'
+import { resumeDownloadUrl, resumeFileName } from '../../content/resume'
 
 const SITE_URL = 'https://my-portfolio-web-murex.vercel.app'
 
@@ -61,7 +62,7 @@ export function ResumePage() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <GlassButton href={profile.resumePdf} download icon={<Download className="h-4 w-4" />} magnetic={false} ariaLabel="Download the original résumé PDF">
+              <GlassButton href={resumeDownloadUrl(profile)} download={resumeFileName(profile)} icon={<Download className="h-4 w-4" />} magnetic={false} ariaLabel="Download the original résumé PDF">
                 Download PDF
               </GlassButton>
               <GlassButton onClick={() => window.print()} variant="glass" icon={<Printer className="h-4 w-4" />} magnetic={false}>

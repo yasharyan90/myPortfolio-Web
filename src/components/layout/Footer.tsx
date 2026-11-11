@@ -12,6 +12,7 @@ import { Tooltip } from '../ui/Tooltip'
 import { NAV_LINKS } from './Navbar'
 import { portfolioProject, profile, socials } from '../../content/live'
 import { useContent } from '../../content/ContentProvider'
+import { resumeDownloadUrl, resumeFileName } from '../../content/resume'
 
 const BUILT_WITH = [
   { label: 'React', skill: 'React.js' },
@@ -184,8 +185,8 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href={profile.resumePdf}
-                    download
+                    href={resumeDownloadUrl(profile)}
+                    download={resumeFileName(profile)}
                     className="group inline-flex items-center gap-2 py-1 text-[14px] tracking-[-0.2px] text-ink-80 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-focus rounded-[4px]"
                   >
                     <Download className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />

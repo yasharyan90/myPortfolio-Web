@@ -16,7 +16,8 @@ interface Props {
   iconRight?: ReactNode
   children: ReactNode
   className?: string
-  download?: boolean
+  /** true, or the file name to save as */
+  download?: boolean | string
   external?: boolean
   magnetic?: boolean
   ariaLabel?: string

@@ -14,6 +14,7 @@ import { ThemeToggle } from '../ui/ThemeToggle'
 import { Tooltip } from '../ui/Tooltip'
 import { profile } from '../../content/live'
 import { useContent } from '../../content/ContentProvider'
+import { resumeDownloadUrl, resumeFileName } from '../../content/resume'
 
 export const NAV_LINKS = [
   { id: 'about', label: 'About' },
@@ -201,8 +202,8 @@ export function Navbar() {
                 </Tooltip>
                 <Tooltip label="Download PDF">
                   <motion.a
-                    href={profile.resumePdf}
-                    download
+                    href={resumeDownloadUrl(profile)}
+                    download={resumeFileName(profile)}
                     aria-label="Download résumé PDF"
                     whileHover={{ scale: 1.06 }}
                     whileTap={{ scale: 0.9 }}
@@ -311,8 +312,8 @@ export function Navbar() {
                   <FileText className="h-4 w-4" /> View résumé
                 </Link>
                 <a
-                  href={profile.resumePdf}
-                  download
+                  href={resumeDownloadUrl(profile)}
+                  download={resumeFileName(profile)}
                   onClick={() => setOpen(false)}
                   className="flex items-center justify-center gap-2 rounded-[11px] bg-ink px-4 py-3 text-[16px] text-on-ink"
                 >

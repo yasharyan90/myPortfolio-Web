@@ -17,11 +17,13 @@ import { Education } from '../components/sections/Education'
 import { Projects } from '../components/sections/Projects'
 import { Skills } from '../components/sections/Skills'
 import { btnCls, FormRenderer, ListEditor, primaryBtnCls } from './fields'
+import { ResumePanel } from './ResumePanel'
 import { SPECS } from './specs'
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
 type Rows = Partial<Record<Section, SectionRow>>
+const isSection = (a: string): a is Section => (SECTIONS as string[]).includes(a)
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v)) as T
 const fmt = (iso: string | null | undefined) => (iso ? new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—')
 
@@ -81,11 +83,11 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
   const { refresh, applyLocal } = useContent()
   const [rows, setRows] = useState<Rows>({})
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [active, setActive] = useState<Section | 'settings'>('profile')
+  const [active, setActive] = useState<Section | 'settings' | 'resume'>('profile')
   // the editor's value is keyed to its section so a section switch never renders a mismatched shape
   const [edit, setEdit] = useState<{ section: Section; value: unknown } | null>(null)
   const value = edit && edit.section === active ? edit.value : null
-  const setValue = (v: unknown) => active !== 'settings' && setEdit({ section: active, value: v })
+  const setValue = (v: unknown) => isSection(active) && setEdit({ section: active, value: v })
   const [loaded, setLoaded] = useState(false)
   const rowsRef = useRef<Rows>({})
   rowsRef.current = rows
@@ -116,7 +118,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
 
   // pick up the draft (or the published document) when the section changes or content first loads
   useEffect(() => {
-    if (active === 'settings' || !loaded) return
+    if (!isSection(active) || !loaded) return
     const r = rowsRef.current[active]
     const base = (r?.draft ?? r?.published ?? snapshot[active]) as unknown
     setEdit({ section: active, value: clone(base) })
@@ -128,7 +130,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
 
   // live preview: this tab shows the draft in place of the published content
   useEffect(() => {
-    if (active === 'settings' || value == null) return
+    if (!isSection(active) || value == null) return
     const doc = publishedDoc(rows)
     if (preview) (doc as unknown as Record<string, unknown>)[active] = value
     try {
@@ -152,7 +154,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
 
   const saveDraft = useCallback(
     async (silent = false) => {
-      if (active === 'settings' || value == null) return
+      if (!isSection(active) || value == null) return
       setBusy('save')
       try {
         const r = await backend.saveDraft(active, value)
@@ -181,7 +183,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
   const publish = async () => {
-    if (active === 'settings') return
+    if (!isSection(active)) return
     const check = validateSection(active, value)
     if (!check.ok) {
       setIssues(check.issues)
@@ -206,7 +208,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
   }
 
   const discard = async () => {
-    if (active === 'settings') return
+    if (!isSection(active)) return
     setBusy('discard')
     try {
       const r = await backend.discardDraft(active)
@@ -220,7 +222,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
   }
 
   const showHistory = async () => {
-    if (active === 'settings') return
+    if (!isSection(active)) return
     setVersions(await backend.versions(active))
   }
   const restore = async (id: number) => {
@@ -250,9 +252,9 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
     }
   }
 
-  const spec = active === 'settings' ? null : SPECS[active]
-  const Preview = active === 'settings' ? null : PREVIEW[active]
-  const previewKey = useMemo(() => (active === 'settings' ? '' : `${active}:${JSON.stringify(value)?.length ?? 0}`), [active, value])
+  const spec = !isSection(active) ? null : SPECS[active]
+  const Preview = !isSection(active) ? null : PREVIEW[active]
+  const previewKey = useMemo(() => (!isSection(active) ? '' : `${active}:${JSON.stringify(value)?.length ?? 0}`), [active, value])
 
   return (
     <div className="container-apple grid gap-6 pb-16 pt-28 lg:grid-cols-[240px_minmax(0,1fr)]">
@@ -282,9 +284,15 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
               </li>
             )
           })}
+          <li className="mt-2 border-t border-black/[0.06] pt-2 dark:border-white/10">
+            <button type="button" onClick={() => setActive('resume')} className={cn('flex w-full items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-left text-[14px]', active === 'resume' ? 'bg-ink text-on-ink' : 'text-ink hover:bg-black/[0.04] dark:hover:bg-white/[0.06]')}>
+              Résumé PDF
+              <span className="text-[11px] font-semibold uppercase tracking-[0.06em] opacity-60">upload</span>
+            </button>
+          </li>
           {settings && (
-            <li className="mt-2 border-t border-black/[0.06] pt-2 dark:border-white/10">
-              <button type="button" onClick={() => setActive('settings')} className={cn('w-full rounded-[10px] px-3 py-2 text-left text-[14px]', active === 'settings' ? 'bg-ink text-on-ink' : 'text-ink hover:bg-black/[0.04] dark:hover:bg-white/[0.06]')}>
+            <li>
+              <button type="button" onClick={() => setActive('settings')} className={cn('w-full rounded-[10px] px-3 py-2 text-left text-[14px]', !isSection(active) ? 'bg-ink text-on-ink' : 'text-ink hover:bg-black/[0.04] dark:hover:bg-white/[0.06]')}>
                 Account & security
               </button>
             </li>
@@ -328,7 +336,9 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
           </div>
         )}
 
-        {active === 'settings' ? (
+        {active === 'resume' ? (
+          <ResumePanel backend={backend} row={rows.profile} onRow={upsertRow} />
+        ) : active === 'settings' ? (
           <div>{settings}</div>
         ) : (
           spec && (
