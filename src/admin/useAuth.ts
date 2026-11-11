@@ -1,6 +1,6 @@
-import type { Session } from '@supabase/supabase-js'
+import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { useCallback, useEffect, useState } from 'react'
-import { getSupabase } from '../content/supabase'
+import { isSupabaseConfigured, loadSupabase } from '../content/supabase'
 
 export type Aal = 'aal1' | 'aal2'
 
@@ -22,7 +22,7 @@ export interface AuthState {
 }
 
 export function useAuth(): AuthState {
-  const sb = getSupabase()
+  const [sb, setSb] = useState<SupabaseClient | null>(null)
   const [ready, setReady] = useState(false)
   const [session, setSession] = useState<Session | null>(null)
   const [aal, setAal] = useState<AuthState['aal']>(null)
@@ -34,11 +34,19 @@ export function useAuth(): AuthState {
     if (data) setAal({ current: (data.currentLevel ?? 'aal1') as Aal, next: (data.nextLevel ?? 'aal1') as Aal })
   }, [sb])
 
+  // the SDK is loaded on demand — only the console pays for it
   useEffect(() => {
-    if (!sb) {
+    if (!isSupabaseConfigured) {
       setReady(true)
       return
     }
+    loadSupabase()
+      .then(setSb)
+      .catch(() => setReady(true))
+  }, [])
+
+  useEffect(() => {
+    if (!sb) return
     let alive = true
     sb.auth.getSession().then(({ data }) => {
       if (!alive) return

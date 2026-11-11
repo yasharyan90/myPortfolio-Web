@@ -1,7 +1,7 @@
 import { LOCAL_KEY } from './ContentProvider'
 import { setLiveContent } from './live'
 import { snapshot } from './snapshot'
-import { getSupabase, mediaUrl } from './supabase'
+import { loadSupabase, mediaUrl } from './supabase'
 import { SECTIONS, type ContentDoc, type Section, type SectionRow, type VersionRow } from './types'
 
 /**
@@ -39,11 +39,7 @@ interface DraftRow {
 }
 
 export function supabaseBackend(): ContentBackend {
-  const sb = () => {
-    const c = getSupabase()
-    if (!c) throw new Error('Supabase is not configured')
-    return c
-  }
+  const sb = () => loadSupabase()
   const fail = (error: { message: string } | null) => {
     if (error) throw new Error(error.message)
   }
@@ -59,9 +55,10 @@ export function supabaseBackend(): ContentBackend {
   })
 
   const rows = async (): Promise<SectionRow[]> => {
+    const c = await sb()
     const [p, d] = await Promise.all([
-      sb().from('content').select('*').in('section', SECTIONS),
-      sb().from('content_drafts').select('*').in('section', SECTIONS),
+      c.from('content').select('*').in('section', SECTIONS),
+      c.from('content_drafts').select('*').in('section', SECTIONS),
     ])
     fail(p.error)
     fail(d.error)
@@ -70,9 +67,10 @@ export function supabaseBackend(): ContentBackend {
     return SECTIONS.map((s) => compose(pub.get(s), dr.get(s), s))
   }
   const row = async (section: Section): Promise<SectionRow> => {
+    const c = await sb()
     const [p, d] = await Promise.all([
-      sb().from('content').select('*').eq('section', section).maybeSingle(),
-      sb().from('content_drafts').select('*').eq('section', section).maybeSingle(),
+      c.from('content').select('*').eq('section', section).maybeSingle(),
+      c.from('content_drafts').select('*').eq('section', section).maybeSingle(),
     ])
     fail(p.error)
     fail(d.error)
@@ -83,33 +81,33 @@ export function supabaseBackend(): ContentBackend {
     kind: 'supabase',
     rows,
     async saveDraft(section, doc) {
-      const { error } = await sb().from('content_drafts').upsert({ section, draft: doc }, { onConflict: 'section' })
+      const { error } = await (await sb()).from('content_drafts').upsert({ section, draft: doc }, { onConflict: 'section' })
       fail(error)
       return row(section)
     },
     async discardDraft(section) {
-      const { error } = await sb().from('content_drafts').delete().eq('section', section)
+      const { error } = await (await sb()).from('content_drafts').delete().eq('section', section)
       fail(error)
       return row(section)
     },
     async publish(section, note) {
-      const { error } = await sb().rpc('publish_section', { p_section: section, p_note: note ?? null })
+      const { error } = await (await sb()).rpc('publish_section', { p_section: section, p_note: note ?? null })
       fail(error)
       return row(section)
     },
     async versions(section) {
-      const { data, error } = await sb().from('content_versions').select('*').eq('section', section).order('published_at', { ascending: false }).limit(50)
+      const { data, error } = await (await sb()).from('content_versions').select('*').eq('section', section).order('published_at', { ascending: false }).limit(50)
       fail(error)
       return data as VersionRow[]
     },
     async restore(id) {
-      const { data, error } = await sb().rpc('restore_version', { p_version_id: id })
+      const { data, error } = await (await sb()).rpc('restore_version', { p_version_id: id })
       fail(error)
       const d = (Array.isArray(data) ? data[0] : data) as DraftRow
       return row(d.section)
     },
     async upload(path, file) {
-      const { error } = await sb().storage.from('media').upload(path, file, { upsert: true, contentType: file.type, cacheControl: '60' })
+      const { error } = await (await sb()).storage.from('media').upload(path, file, { upsert: true, contentType: file.type, cacheControl: '60' })
       fail(error)
       // bust caches on the public URL so a replaced file shows up immediately
       return `${mediaUrl(path)}?v=${Date.now()}`
@@ -120,7 +118,7 @@ export function supabaseBackend(): ContentBackend {
       const missing = SECTIONS.filter((s) => !have.has(s))
       if (!missing.length) return existing
       const batch = missing.map((section) => ({ section, published: snapshot[section], published_at: new Date().toISOString() }))
-      const { error } = await sb().from('content').upsert(batch, { onConflict: 'section' })
+      const { error } = await (await sb()).from('content').upsert(batch, { onConflict: 'section' })
       fail(error)
       return rows()
     },

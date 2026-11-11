@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { getContent, mergeSections, setLiveContent, subscribeContent } from './live'
 import { snapshot } from './snapshot'
-import { getSupabase, isSupabaseConfigured } from './supabase'
+import { anonHeaders, isSupabaseConfigured, loadSupabase, SUPABASE_URL } from './supabase'
 import { SECTIONS, type ContentDoc, type ResolvedContent, type Section } from './types'
 
 export type ContentSource = 'snapshot' | 'cache' | 'live' | 'local'
@@ -38,15 +38,20 @@ function writeJson(key: string, value: unknown) {
   }
 }
 
-/** Published sections from Supabase, as a partial document. */
+/** Published sections from Supabase, as a partial document — plain fetch, no SDK on the visitor's path. */
 export async function fetchPublished(): Promise<Partial<Record<Section, unknown>> | null> {
-  const sb = getSupabase()
-  if (!sb) return null
-  const { data, error } = await sb.from('content').select('section, published').in('section', SECTIONS)
-  if (error || !data) return null
-  const out: Partial<Record<Section, unknown>> = {}
-  for (const row of data as { section: Section; published: unknown }[]) if (row.published) out[row.section] = row.published
-  return out
+  if (!isSupabaseConfigured) return null
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/content?select=section,published&section=in.(${SECTIONS.join(',')})`
+    const res = await fetch(url, { headers: { ...anonHeaders(), accept: 'application/json' } })
+    if (!res.ok) return null
+    const data = (await res.json()) as { section: Section; published: unknown }[]
+    const out: Partial<Record<Section, unknown>> = {}
+    for (const row of data) if (row.published) out[row.section] = row.published
+    return out
+  } catch {
+    return null
+  }
 }
 
 export function ContentProvider({ children }: { children: ReactNode }) {
@@ -81,16 +86,28 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       const cached = readJson<{ at: number; rows: Partial<Record<Section, unknown>> }>(CACHE_KEY)
       if (cached?.rows) apply(mergeSections(snapshot, cached.rows), 'cache')
       void refresh()
-      const sb = getSupabase()!
-      const channel = sb
-        .channel('content-published')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'content' }, () => void refresh())
-        .subscribe()
+      // Realtime needs the SDK: load it after first paint so it never delays the page
+      let cancelled = false
+      let cleanup: (() => void) | null = null
+      const timer = window.setTimeout(() => {
+        loadSupabase()
+          .then((sb) => {
+            if (cancelled) return
+            const channel = sb
+              .channel('content-published')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'content' }, () => void refresh())
+              .subscribe()
+            cleanup = () => void sb.removeChannel(channel)
+          })
+          .catch(() => undefined)
+      }, 1500)
       const onFocus = () => void refresh()
       window.addEventListener('focus', onFocus)
       return () => {
+        cancelled = true
+        window.clearTimeout(timer)
         window.removeEventListener('focus', onFocus)
-        void sb.removeChannel(channel)
+        cleanup?.()
       }
     }
     // no database: honour edits made in this browser's local console, if any
