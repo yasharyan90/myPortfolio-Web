@@ -220,6 +220,8 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
       setEdit({ section: active, value: clone((r.published ?? snapshot[active]) as unknown) })
       setDirty(false)
       setStatus(r.published_at ? `Published ${fmt(r.published_at)}` : 'Not published yet')
+    } catch (e) {
+      setStatus(`Could not discard: ${e instanceof Error ? e.message : String(e)}`)
     } finally {
       setBusy(null)
     }
@@ -238,19 +240,25 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
       setDirty(false)
       setVersions(null)
       setStatus('Version restored into the draft — publish to make it live')
+    } catch (e) {
+      setStatus(`Could not restore: ${e instanceof Error ? e.message : String(e)}`)
     } finally {
       setBusy(null)
     }
   }
 
+  const [seedError, setSeedError] = useState<string | null>(null)
   const seed = async () => {
     setBusy('seed')
+    setSeedError(null)
     try {
       const list = await backend.seed()
       const map: Rows = {}
       for (const r of list) map[r.section] = r
       setRows(map)
       await refresh()
+    } catch (e) {
+      setSeedError(e instanceof Error ? e.message : String(e))
     } finally {
       setBusy(null)
     }
@@ -338,6 +346,12 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
             <button type="button" onClick={seed} disabled={busy === 'seed'} className={primaryBtnCls}>
               {busy === 'seed' ? 'Seeding…' : unseeded.length === SECTIONS.length ? 'Seed from site' : `Seed ${unseeded.length} section${unseeded.length > 1 ? 's' : ''}`}
             </button>
+            {seedError && (
+              <p className="basis-full text-[13px] text-red-600">
+                <b>Seeding failed:</b> {seedError}
+                {/violates check constraint|is_object/i.test(seedError) && <> — run <code className="font-mono">supabase/migrations/0002_allow_array_sections.sql</code> in the SQL editor, then try again.</>}
+              </p>
+            )}
           </div>
         )}
 

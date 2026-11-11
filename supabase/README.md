@@ -44,6 +44,12 @@ run again.
 The owner email is set near the top of that file (`insert into public.owners …`). Change it there
 before running if needed; to add another editor later, insert another row in the SQL editor.
 
+### Already ran the migration before 11 Nov 2026, 15:30 IST?
+
+Also run `supabase/migrations/0002_allow_array_sections.sql` the same way. It relaxes two check
+constraints so the array-shaped sections (projects, education, coding profiles) can be saved.
+Without it, seeding and saving those three sections fails.
+
 ## 4. Create the owner account and turn sign-ups off
 
 - *Authentication* → *Users* → *Add user* → *Create new user* → the owner email + a strong

@@ -38,7 +38,8 @@ create table if not exists public.content (
   published_at timestamptz,
   updated_at   timestamptz not null default now(),
   updated_by   text,
-  constraint content_published_is_object check (published is null or jsonb_typeof(published) = 'object')
+  -- sections are JSON objects or, for projects / education / socials, JSON arrays
+  constraint content_published_is_object check (published is null or jsonb_typeof(published) in ('object', 'array'))
 );
 
 -- ── drafts: owner only ───────────────────────────────────────────────────
@@ -47,7 +48,7 @@ create table if not exists public.content_drafts (
   draft      jsonb not null,
   updated_at timestamptz not null default now(),
   updated_by text,
-  constraint content_draft_is_object check (jsonb_typeof(draft) = 'object')
+  constraint content_draft_is_object check (jsonb_typeof(draft) in ('object', 'array'))
 );
 
 -- ── every publish, for history and rollback: owner only ──────────────────
