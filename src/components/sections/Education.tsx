@@ -1,7 +1,6 @@
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll, useSpring } from 'framer-motion'
 import { ChevronDown, MapPin } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { education, type Education as Entry } from '../../data/education'
 import { cn } from '../../lib/cn'
 import { appleEase, fadeUp, spring, stagger, viewport } from '../../lib/motion'
 import { Background } from '../layout/Background'
@@ -9,6 +8,8 @@ import { Chip } from '../ui/Chip'
 import { CountUp } from '../ui/CountUp'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
+import { education, type Education as Entry } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 /* ── derive what we can from the data strings ───────────────────────────── */
 
@@ -241,6 +242,7 @@ function Item({ entry, index, open, reached, onToggle }: ItemProps) {
 /* ── section ────────────────────────────────────────────────────────────── */
 
 export function Education() {
+  useContent()
   const [open, setOpen] = useState<number | null>(0)
   const listRef = useRef<HTMLOListElement>(null)
   const n = education.length

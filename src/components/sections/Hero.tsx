@@ -1,8 +1,6 @@
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 import { ArrowDown, ChevronDown, Download, FileText, MapPin, RotateCcw, Terminal as TerminalIcon } from 'lucide-react'
-import { useEffect, useRef, useState, type MouseEvent } from 'react'
-import { profile } from '../../data/profile'
-import { socials } from '../../data/socials'
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { Link, useRoute } from '../../hooks/useRoute'
 import { useTerminal } from '../../hooks/useTerminal'
 import { cn } from '../../lib/cn'
@@ -14,6 +12,8 @@ import { GlassButton } from '../ui/GlassButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SocialButton } from '../ui/SocialButton'
 import { Tooltip } from '../ui/Tooltip'
+import { profile, socials } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 /** Floating chips around the portrait — each opens its skill in the Skills section. */
 const floatingChips = [
@@ -23,12 +23,6 @@ const floatingChips = [
   { text: 'Redis Pub/Sub', skill: 'Redis Pub/Sub', x: '72%', y: '80%', delay: 1.8 },
 ]
 
-/** Lines the subtitle cycles through — all lifted from the profile data. */
-const ROLES = [
-  profile.role,
-  profile.facts.find((f) => f.label === 'Focus')?.value ?? '',
-  profile.facts.find((f) => f.label === 'Studying')?.value ?? '',
-].filter(Boolean)
 
 /** Where each stat tile leads when clicked, matched on its label. */
 function statTarget(label: string): { href?: string; project?: string; hint: string } {
@@ -38,7 +32,7 @@ function statTarget(label: string): { href?: string; project?: string; hint: str
   return { href: '/#projects', hint: 'Browse the projects' }
 }
 
-function RotatingRole() {
+function RotatingRole({ roles: ROLES }: { roles: string[] }) {
   const reduce = useReducedMotion()
   const [i, setI] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -77,6 +71,13 @@ function RotatingRole() {
 }
 
 export function Hero() {
+  useContent()
+  /** Lines the subtitle cycles through — all lifted from the profile data. */
+  const ROLES = useMemo(
+    () => [profile.role, profile.facts.find((f) => f.label === 'Focus')?.value ?? '', profile.facts.find((f) => f.label === 'Studying')?.value ?? ''].filter(Boolean),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [profile],
+  )
   const frameRef = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion()
   const { open: openTerminal } = useTerminal()
@@ -127,7 +128,7 @@ export function Hero() {
             className="mt-6 font-display text-[44px] font-semibold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[56px] md:text-[64px] lg:text-[72px]"
           >
             {profile.name}.
-            <RotatingRole />
+            <RotatingRole roles={ROLES} />
           </motion.h1>
 
           <motion.p variants={fadeUp} className="mt-6 max-w-[560px] text-[19px] font-light leading-[1.45] text-ink-80 sm:text-[21px]">

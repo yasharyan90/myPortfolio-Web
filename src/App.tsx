@@ -12,6 +12,9 @@ import { Projects } from './components/sections/Projects'
 import { Skills } from './components/sections/Skills'
 import { NowPage } from './components/pages/NowPage'
 import { ResumePage } from './components/pages/ResumePage'
+import { Suspense, lazy } from 'react'
+
+const AdminPage = lazy(() => import('./components/pages/AdminPage'))
 import { Terminal } from './components/terminal/Terminal'
 import { useRoute } from './hooks/useRoute'
 
@@ -31,6 +34,10 @@ export default function App() {
           <NowPage />
         ) : path === '/resume' ? (
           <ResumePage />
+        ) : path === '/admin' ? (
+          <Suspense fallback={<div className="container-apple pt-32 text-[14px] text-ink-48">Loading the console…</div>}>
+            <AdminPage />
+          </Suspense>
         ) : (
           <>
             <Hero />

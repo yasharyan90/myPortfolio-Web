@@ -1,9 +1,6 @@
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 import { ArrowUp, ArrowUpRight, Download, FileText, GitCommitHorizontal, Terminal as TerminalIcon } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
-import { portfolioProject } from '../../data/now'
-import { profile } from '../../data/profile'
-import { socials } from '../../data/socials'
 import { Link, useRoute } from '../../hooks/useRoute'
 import { useTerminal } from '../../hooks/useTerminal'
 import { cn } from '../../lib/cn'
@@ -13,8 +10,9 @@ import { SocialButton } from '../ui/SocialButton'
 import { ThemeToggle } from '../ui/ThemeToggle'
 import { Tooltip } from '../ui/Tooltip'
 import { NAV_LINKS } from './Navbar'
+import { portfolioProject, profile, socials } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
-const REPO = portfolioProject.links.find((l) => l.kind === 'github')?.href ?? 'https://github.com/yasharyan90'
 const BUILT_WITH = [
   { label: 'React', skill: 'React.js' },
   { label: 'Tailwind CSS', skill: 'Tailwind CSS' },
@@ -85,6 +83,8 @@ function FooterLink({ href, children, external }: { href: string; children: Reac
 }
 
 export function Footer() {
+  useContent()
+  const REPO = portfolioProject.links.find((l) => l.kind === 'github')?.href ?? 'https://github.com/yasharyan90'
   const { path } = useRoute()
   const { open: openTerminal } = useTerminal()
   const reduce = useReducedMotion()

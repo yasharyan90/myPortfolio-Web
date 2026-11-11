@@ -1,19 +1,12 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft, Check, Download, Link2, Mail, MapPin, Phone, Printer } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { achievements, certifications } from '../../data/certifications'
-import { education } from '../../data/education'
-import { profile } from '../../data/profile'
-import { projects } from '../../data/projects'
-import { competencies, skillGroups } from '../../data/skills'
-import { socials } from '../../data/socials'
 import { Link } from '../../hooks/useRoute'
 import { fadeUp, stagger } from '../../lib/motion'
 import { GlassButton } from '../ui/GlassButton'
+import { achievements, certifications, education, profile, projects, competencies, skillGroups, socials } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
-/** Projects that lead the résumé — the ones with a public link, newest first, capped so it stays near two pages. */
-const featured = projects.filter((p) => p.links.length > 0).slice(0, 4)
-const webLinks = socials.filter((s) => ['github', 'linkedin', 'leetcode'].includes(s.id))
 const SITE_URL = 'https://my-portfolio-web-murex.vercel.app'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -26,6 +19,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function ResumePage() {
+  useContent()
+  /** Projects that lead the résumé — the ones with a public link, newest first, capped so it stays near two pages. */
+  const featured = projects.filter((p) => p.links.length > 0).slice(0, 4)
+  const webLinks = socials.filter((s) => ['github', 'linkedin', 'leetcode'].includes(s.id))
   const [copied, setCopied] = useState(false)
   useEffect(() => {
     const prev = document.title

@@ -1,7 +1,6 @@
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring } from 'framer-motion'
 import { Download, FileText, Menu, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
-import { profile } from '../../data/profile'
 import { useActiveSection } from '../../hooks/useActiveSection'
 import { Link, useRoute } from '../../hooks/useRoute'
 import { useTerminal } from '../../hooks/useTerminal'
@@ -13,6 +12,8 @@ import { NowToggle } from '../ui/NowToggle'
 import { TerminalToggle } from '../ui/TerminalToggle'
 import { ThemeToggle } from '../ui/ThemeToggle'
 import { Tooltip } from '../ui/Tooltip'
+import { profile } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 export const NAV_LINKS = [
   { id: 'about', label: 'About' },
@@ -27,6 +28,7 @@ export const NAV_LINKS = [
 const BAND = 0.4
 
 export function Navbar() {
+  useContent()
   const ids = useMemo(() => ['hero', ...NAV_LINKS.map((l) => l.id)], [])
   const { path, navigate } = useRoute()
   const sectionActive = useActiveSection(ids)

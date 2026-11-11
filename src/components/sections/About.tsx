@@ -1,13 +1,14 @@
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import { type MouseEvent, type ReactNode } from 'react'
-import { profile } from '../../data/profile'
 import { Link } from '../../hooks/useRoute'
 import { fadeUp, spring, stagger, viewport } from '../../lib/motion'
 import { CountUp } from '../ui/CountUp'
 import { GlassPanel } from '../ui/GlassPanel'
 import { LinkedProse } from '../ui/LinkedProse'
 import { SectionHeading } from '../ui/SectionHeading'
+import { profile } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 /* ── a panel that tilts a few degrees toward the cursor ─────────────────── */
 
@@ -44,6 +45,7 @@ const FACT_LINKS: Record<string, { href: string; hint: string }> = {
 }
 
 export function About() {
+  useContent()
   return (
     <section id="about" className="section relative">
       <div className="container-apple">

@@ -1,13 +1,14 @@
 import { AnimatePresence, LayoutGroup, motion, MotionConfig } from 'framer-motion'
 import { ArrowUpRight, MousePointerClick } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { competencies, skillGroups } from '../../data/skills'
 import { cn } from '../../lib/cn'
 import { appleEase, fadeUp, spring, stagger, viewport } from '../../lib/motion'
-import { clearPending, pairedWith, PENDING_SKILL_KEY, readPending, SHOW_SKILL_EVENT, showProject, skillEntries, type SkillEntry } from '../../lib/skillUsage'
+import { clearPending, getSkillEntries, pairedWith, PENDING_SKILL_KEY, readPending, SHOW_SKILL_EVENT, showProject, type SkillEntry } from '../../lib/skillUsage'
 import { Chip } from '../ui/Chip'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
+import { competencies, skillGroups } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 const ALL = 'All'
 
@@ -74,6 +75,8 @@ const panelMotion = {
 }
 
 function Overview({ shown }: { shown: number }) {
+  useContent()
+  const skillEntries = getSkillEntries()
   const total = skillEntries.length
   const powered = new Set(skillEntries.flatMap((e) => e.used.map((p) => p.id))).size
   const stats = [
@@ -180,6 +183,8 @@ function Detail({ entry, onPick }: { entry: SkillEntry; onPick: (e: SkillEntry) 
 /* ── Section ────────────────────────────────────────────────────────────── */
 
 export function Skills() {
+  useContent()
+  const skillEntries = getSkillEntries()
   const [filter, setFilter] = useState(ALL)
   const [pinned, setPinned] = useState<SkillEntry | null>(null)
   const [peek, setPeek] = useState<SkillEntry | null>(null)
@@ -191,7 +196,7 @@ export function Skills() {
     setPeek(e)
   }
 
-  const shown = useMemo(() => (filter === ALL ? skillEntries : skillEntries.filter((e) => e.group === filter)), [filter])
+  const shown = useMemo(() => (filter === ALL ? skillEntries : skillEntries.filter((e) => e.group === filter)), [filter, skillEntries])
 
   // other sections (About's linked keywords) can ask for a skill to be pinned and brought into view
   useEffect(() => {

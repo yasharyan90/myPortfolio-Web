@@ -1,11 +1,5 @@
-import { achievements, certifications } from '../data/certifications'
-import { education } from '../data/education'
-import { profile } from '../data/profile'
-import { projects } from '../data/projects'
-import { bySocialId, socials } from '../data/socials'
-import { competencies, skillGroups } from '../data/skills'
-import { now, workingOn } from '../data/now'
 import type { Command, CommandResult, Line, TermContext, TermPalette } from './types'
+import { achievements, certifications, education, profile, projects, bySocialId, socials, competencies, skillGroups, now, workingOn } from '../content/live'
 
 /* ── helpers ─────────────────────────────────────────────────────────── */
 
@@ -334,6 +328,12 @@ reg('tree', 'navigate', 'directory tree of the portfolio', null, () => [
   blank(),
   dim(`1 directory, ${7 + projects.length} files`),
 ])
+
+reg('admin', 'navigate', 'open the owner console (sign-in required)', null, (_a, ctx) => {
+  ctx.openUrl('/admin')
+  return [cyan('opening /admin'), dim('only the site owner can sign in there')]
+})
+reg('login', 'navigate', 'alias of admin', null, (a, ctx) => COMMANDS.admin.run(a, ctx))
 
 reg('top', 'navigate', 'scroll back to the top', null, (_a, ctx) => {
   ctx.scrollTo('hero')

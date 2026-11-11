@@ -1,14 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUpRight, Check, Clipboard, Contact as ContactIcon, Copy, Mail, Phone, Send } from 'lucide-react'
 import { useEffect, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { profile } from '../../data/profile'
-import { socials } from '../../data/socials'
 import { cn } from '../../lib/cn'
 import { appleEase, fadeUp, spring, stagger, viewport } from '../../lib/motion'
 import { Background } from '../layout/Background'
 import { GlassButton } from '../ui/GlassButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SocialButton } from '../ui/SocialButton'
+import { profile, socials } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
@@ -131,6 +131,7 @@ const DRAFT_KEY = 'contact-draft'
 const MAX = 1000
 
 function Composer() {
+  useContent()
   const [intent, setIntent] = useState<IntentId>('internship')
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
@@ -291,6 +292,7 @@ function Composer() {
 }
 
 function RightNow() {
+  useContent()
   const now = useNow()
   const time = new Intl.DateTimeFormat('en-GB', { timeZone: MY_TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(now)
   const day = new Intl.DateTimeFormat('en-GB', { timeZone: MY_TZ, weekday: 'short' }).format(now)
@@ -335,6 +337,7 @@ function RightNow() {
 /* ── section ────────────────────────────────────────────────────────────── */
 
 export function Contact() {
+  useContent()
   return (
     <section id="contact" className="section relative overflow-hidden bg-tile-1 text-white">
       <Background tone="dark" mode="absolute" />

@@ -1,0 +1,156 @@
+import { LOCAL_KEY } from './ContentProvider'
+import { setLiveContent } from './live'
+import { snapshot } from './snapshot'
+import { getSupabase, mediaUrl } from './supabase'
+import { SECTIONS, type ContentDoc, type Section, type SectionRow, type VersionRow } from './types'
+
+/**
+ * What the owner console talks to. Supabase in production; a localStorage stand-in when no
+ * database is configured, so the console can be tried (and the editors tested) in one browser.
+ */
+export interface ContentBackend {
+  kind: 'supabase' | 'local'
+  rows(): Promise<SectionRow[]>
+  saveDraft(section: Section, doc: unknown): Promise<SectionRow>
+  discardDraft(section: Section): Promise<SectionRow>
+  publish(section: Section, note?: string): Promise<SectionRow>
+  versions(section: Section): Promise<VersionRow[]>
+  restore(versionId: number): Promise<SectionRow>
+  /** returns the public URL of the uploaded file */
+  upload(path: string, file: File): Promise<string>
+  /** write the bundled snapshot into every section that has nothing published yet */
+  seed(): Promise<SectionRow[]>
+}
+
+/* ── Supabase ────────────────────────────────────────────────────────────── */
+
+export function supabaseBackend(): ContentBackend {
+  const sb = () => {
+    const c = getSupabase()
+    if (!c) throw new Error('Supabase is not configured')
+    return c
+  }
+  const one = async (q: PromiseLike<{ data: unknown; error: { message: string } | null }>): Promise<SectionRow> => {
+    const { data, error } = await q
+    if (error) throw new Error(error.message)
+    return data as SectionRow
+  }
+  return {
+    kind: 'supabase',
+    async rows() {
+      const { data, error } = await sb().from('content').select('*').in('section', SECTIONS)
+      if (error) throw new Error(error.message)
+      return data as SectionRow[]
+    },
+    saveDraft: (section, doc) =>
+      one(sb().from('content').upsert({ section, draft: doc }, { onConflict: 'section' }).select().single()),
+    discardDraft: (section) => one(sb().from('content').update({ draft: null }).eq('section', section).select().single()),
+    publish: (section, note) => one(sb().rpc('publish_section', { p_section: section, p_note: note ?? null }).single()),
+    async versions(section) {
+      const { data, error } = await sb().from('content_versions').select('*').eq('section', section).order('published_at', { ascending: false }).limit(50)
+      if (error) throw new Error(error.message)
+      return data as VersionRow[]
+    },
+    restore: (id) => one(sb().rpc('restore_version', { p_version_id: id }).single()),
+    async upload(path, file) {
+      const { error } = await sb().storage.from('media').upload(path, file, { upsert: true, contentType: file.type, cacheControl: '60' })
+      if (error) throw new Error(error.message)
+      // bust caches on the public URL so a replaced file shows up immediately
+      return `${mediaUrl(path)}?v=${Date.now()}`
+    },
+    async seed() {
+      const existing = await this.rows()
+      const have = new Set(existing.filter((r) => r.published).map((r) => r.section))
+      const missing = SECTIONS.filter((s) => !have.has(s))
+      if (!missing.length) return existing
+      const rows = missing.map((section) => ({ section, draft: null, published: snapshot[section], published_at: new Date().toISOString() }))
+      const { error } = await sb().from('content').upsert(rows, { onConflict: 'section' })
+      if (error) throw new Error(error.message)
+      return this.rows()
+    },
+  }
+}
+
+/* ── local (no database) ─────────────────────────────────────────────────── */
+
+interface LocalState {
+  rows: Record<Section, SectionRow>
+  versions: VersionRow[]
+}
+const LOCAL_STATE_KEY = 'portfolio:console:local'
+
+function loadLocal(): LocalState {
+  try {
+    const raw = localStorage.getItem(LOCAL_STATE_KEY)
+    if (raw) return JSON.parse(raw) as LocalState
+  } catch {
+    /* ignore */
+  }
+  const rows = Object.fromEntries(
+    SECTIONS.map((s) => [s, { section: s, draft: null, published: snapshot[s], published_at: null, updated_at: null }]),
+  ) as Record<Section, SectionRow>
+  return { rows, versions: [] }
+}
+function saveLocal(state: LocalState) {
+  localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(state))
+}
+function publishedDoc(state: LocalState): ContentDoc {
+  const doc = { ...snapshot }
+  for (const s of SECTIONS) if (state.rows[s].published) (doc as Record<string, unknown>)[s] = state.rows[s].published
+  return doc
+}
+
+export function localBackend(): ContentBackend {
+  const state = loadLocal()
+  const touch = (s: Section) => {
+    state.rows[s].updated_at = new Date().toISOString()
+    saveLocal(state)
+    return state.rows[s]
+  }
+  return {
+    kind: 'local',
+    async rows() {
+      return SECTIONS.map((s) => state.rows[s])
+    },
+    async saveDraft(section, doc) {
+      state.rows[section].draft = doc
+      return touch(section)
+    },
+    async discardDraft(section) {
+      state.rows[section].draft = null
+      return touch(section)
+    },
+    async publish(section, note) {
+      const r = state.rows[section]
+      r.published = r.draft ?? r.published
+      r.published_at = new Date().toISOString()
+      state.versions.unshift({ id: Date.now(), section, snapshot: r.published, published_at: r.published_at, published_by: 'local', note: note ?? null })
+      touch(section)
+      const doc = publishedDoc(state)
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(doc))
+      setLiveContent(doc)
+      return r
+    },
+    async versions(section) {
+      return state.versions.filter((v) => v.section === section)
+    },
+    async restore(id) {
+      const v = state.versions.find((x) => x.id === id)
+      if (!v) throw new Error('unknown version')
+      state.rows[v.section].draft = v.snapshot
+      return touch(v.section)
+    },
+    async upload(_path, file) {
+      // no storage locally: keep the file in the page as a data URL (fine for a preview)
+      return new Promise((resolve, reject) => {
+        const r = new FileReader()
+        r.onload = () => resolve(String(r.result))
+        r.onerror = () => reject(new Error('could not read file'))
+        r.readAsDataURL(file)
+      })
+    },
+    async seed() {
+      return this.rows()
+    },
+  }
+}

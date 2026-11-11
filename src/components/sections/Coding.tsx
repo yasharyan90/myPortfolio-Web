@@ -1,7 +1,6 @@
 import { motion, useInView } from 'framer-motion'
 import { ArrowUpRight, Check, Copy } from 'lucide-react'
 import { useRef, useState, type ReactNode } from 'react'
-import { bySocialId, contactProfiles, type Social } from '../../data/socials'
 import { cn } from '../../lib/cn'
 import { monthYear, useCodeforces, useGitHubStats, useLeetCode, type Live } from '../../lib/liveStats'
 import { fadeUp, spring, stagger, viewport } from '../../lib/motion'
@@ -10,6 +9,8 @@ import { CountUp } from '../ui/CountUp'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
 import { SocialButton } from '../ui/SocialButton'
+import { bySocialId, contactProfiles, type ResolvedSocial } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 /* ── small parts ────────────────────────────────────────────────────────── */
 
@@ -143,7 +144,7 @@ function GitHubBlock({ live, fallback }: { live: Live<import('../../lib/liveStat
 
 /* ── platform card ──────────────────────────────────────────────────────── */
 
-function PlatformCard({ social, children }: { social: Social; children: (inView: boolean) => ReactNode }) {
+function PlatformCard({ social, children }: { social: ResolvedSocial; children: (inView: boolean) => ReactNode }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '200px 0px' })
   const Icon = social.icon
@@ -194,26 +195,25 @@ function PlatformCard({ social, children }: { social: Social; children: (inView:
 
 /* ── section ────────────────────────────────────────────────────────────── */
 
-const github = bySocialId('github')
-const leetcode = bySocialId('leetcode')
-const gfg = bySocialId('gfg')
-const codeforces = bySocialId('codeforces')
-
-const GH_LOGIN = github.handle.replace(/^@/, '')
-const LC_USER = leetcode.handle
-const CF_HANDLE = codeforces.handle
-
-function LiveGitHub({ inView }: { inView: boolean }) {
-  return <GitHubBlock live={useGitHubStats(GH_LOGIN, inView)} fallback={github.blurb} />
+function LiveGitHub({ inView, login, fallback }: { inView: boolean; login: string; fallback: string }) {
+  return <GitHubBlock live={useGitHubStats(login, inView)} fallback={fallback} />
 }
-function LiveLeetCode({ inView }: { inView: boolean }) {
-  return <LeetCodeBlock live={useLeetCode(LC_USER, inView)} fallback={leetcode.blurb} />
+function LiveLeetCode({ inView, user, fallback }: { inView: boolean; user: string; fallback: string }) {
+  return <LeetCodeBlock live={useLeetCode(user, inView)} fallback={fallback} />
 }
-function LiveCodeforces({ inView }: { inView: boolean }) {
-  return <CodeforcesBlock live={useCodeforces(CF_HANDLE, inView)} fallback={codeforces.blurb} />
+function LiveCodeforces({ inView, handle, fallback }: { inView: boolean; handle: string; fallback: string }) {
+  return <CodeforcesBlock live={useCodeforces(handle, inView)} fallback={fallback} />
 }
 
 export function Coding() {
+  useContent()
+  const github = bySocialId('github')
+  const leetcode = bySocialId('leetcode')
+  const gfg = bySocialId('gfg')
+  const codeforces = bySocialId('codeforces')
+  const GH_LOGIN = github.handle.replace(/^@/, '')
+  const LC_USER = leetcode.handle
+  const CF_HANDLE = codeforces.handle
   return (
     <section id="coding" className="section relative">
       <div className="container-apple">
@@ -240,8 +240,8 @@ export function Coding() {
           viewport={viewport}
           className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
         >
-          <PlatformCard social={github}>{(inView) => <LiveGitHub inView={inView} />}</PlatformCard>
-          <PlatformCard social={leetcode}>{(inView) => <LiveLeetCode inView={inView} />}</PlatformCard>
+          <PlatformCard social={github}>{(inView) => <LiveGitHub inView={inView} login={GH_LOGIN} fallback={github.blurb} />}</PlatformCard>
+          <PlatformCard social={leetcode}>{(inView) => <LiveLeetCode inView={inView} user={LC_USER} fallback={leetcode.blurb} />}</PlatformCard>
           <PlatformCard social={gfg}>
             {() => (
               <div>
@@ -251,7 +251,7 @@ export function Coding() {
               </div>
             )}
           </PlatformCard>
-          <PlatformCard social={codeforces}>{(inView) => <LiveCodeforces inView={inView} />}</PlatformCard>
+          <PlatformCard social={codeforces}>{(inView) => <LiveCodeforces inView={inView} handle={CF_HANDLE} fallback={codeforces.blurb} />}</PlatformCard>
         </motion.div>
 
         <motion.div

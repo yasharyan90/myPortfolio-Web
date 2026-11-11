@@ -2,7 +2,6 @@ import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform,
 import { ArrowLeft, ArrowRight, ArrowUpRight, ExternalLink } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type UIEvent } from 'react'
 import { SiGithub } from 'react-icons/si'
-import { projects, type Project } from '../../data/projects'
 import { clearPending, PENDING_PROJECT_KEY, readPending, SHOW_PROJECT_EVENT } from '../../lib/skillUsage'
 import { appleEase, fadeUp, stagger } from '../../lib/motion'
 import { cn } from '../../lib/cn'
@@ -11,6 +10,9 @@ import { Chip } from '../ui/Chip'
 import { GlassButton } from '../ui/GlassButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
+import { projects, type Project } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
+import { useInPreview } from '../../content/preview'
 
 const HEADING = {
   eyebrow: 'Projects',
@@ -267,6 +269,7 @@ function useMediaQuery(query: string) {
 }
 
 function PinnedProjects() {
+  useContent()
   const n = projects.length
   const wrapRef = useRef<HTMLDivElement>(null)
   const paneRef = useRef<HTMLDivElement>(null)
@@ -375,6 +378,7 @@ function PinnedProjects() {
 /* ── Mobile / reduced motion: native swipe carousel with snap points ─────── */
 
 function SwipeProjects() {
+  useContent()
   const n = projects.length
   const trackRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
@@ -438,7 +442,8 @@ function SwipeProjects() {
 export function Projects() {
   const reduce = useReducedMotion()
   const desktop = useMediaQuery('(min-width: 1024px)')
-  const pinned = desktop && !reduce
+  const inPreview = useInPreview()
+  const pinned = desktop && !reduce && !inPreview
   return (
     <section id="projects" className="relative bg-tile-1 text-white">
       {pinned ? <PinnedProjects /> : <SwipeProjects />}

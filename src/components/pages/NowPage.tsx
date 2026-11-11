@@ -23,10 +23,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { SiGithub } from 'react-icons/si'
-import { now, workingOn } from '../../data/now'
-import { profile } from '../../data/profile'
 import type { Project } from '../../data/projects'
-import { bySocialId } from '../../data/socials'
 import { Link } from '../../hooks/useRoute'
 import { cn } from '../../lib/cn'
 import { appleEase, fadeUp, spring, stagger, viewport } from '../../lib/motion'
@@ -37,6 +34,8 @@ import { GlassPanel } from '../ui/GlassPanel'
 import { LinkedProse } from '../ui/LinkedProse'
 import { SectionHeading } from '../ui/SectionHeading'
 import { Tooltip } from '../ui/Tooltip'
+import { now, workingOn, profile, bySocialId } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 /* ── time helpers ────────────────────────────────────────────────────── */
 
@@ -279,6 +278,7 @@ const FOCUS_LINKS: Record<string, { href: string; hint: string }> = {
 }
 
 export function NowPage() {
+  useContent()
   const tick = useTick(1000)
   const github = bySocialId('github')
   const username = github.href.split('/').filter(Boolean).pop() ?? ''

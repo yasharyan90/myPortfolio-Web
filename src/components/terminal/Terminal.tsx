@@ -1,6 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
-import { profile } from '../../data/profile'
 import { useTerminal } from '../../hooks/useTerminal'
 import { useTheme } from '../../hooks/useTheme'
 import { cn } from '../../lib/cn'
@@ -8,6 +7,7 @@ import { appleEase } from '../../lib/motion'
 import { COMMAND_COUNT, PALETTES, SECTIONS, STARTER_COMMANDS, commandNames, fileNames, neofetch, projectIds, runCommand } from '../../terminal/commands'
 import type { Line, TermContext, TermPalette } from '../../terminal/types'
 import { MatrixRain } from './MatrixRain'
+import { profile } from '../../content/live'
 
 /* ── types ───────────────────────────────────────────────────────────── */
 

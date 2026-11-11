@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import type { CSSProperties } from 'react'
-import type { Social } from '../../data/socials'
+import type { ResolvedSocial } from '../../content/types'
 import { useEffectiveTone } from '../../hooks/useTheme'
 import { cn } from '../../lib/cn'
 import { fadeUp, spring } from '../../lib/motion'
@@ -9,7 +9,7 @@ import type { Tone } from './GlassPanel'
 import { Magnetic } from './Magnetic'
 
 interface Props {
-  social: Social
+  social: ResolvedSocial
   tone?: Tone
   variant?: 'pill' | 'card' | 'icon'
   className?: string

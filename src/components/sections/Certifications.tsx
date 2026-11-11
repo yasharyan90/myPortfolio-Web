@@ -1,7 +1,6 @@
 import { AnimatePresence, LayoutGroup, motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import { ArrowUpRight, Award, BadgeCheck, GraduationCap, Sparkles } from 'lucide-react'
 import { useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react'
-import { achievements, certifications, type Certification } from '../../data/certifications'
 import { Link } from '../../hooks/useRoute'
 import { cn } from '../../lib/cn'
 import { appleEase, fadeUp, spring, stagger, viewport } from '../../lib/motion'
@@ -11,6 +10,8 @@ import { CountUp } from '../ui/CountUp'
 import { GlassButton } from '../ui/GlassButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
+import { achievements, certifications, type Certification } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 /* ── derived from the data ─────────────────────────────────────────────── */
 
@@ -26,10 +27,6 @@ function tierOf(c: Certification): string | null {
   return t || null
 }
 
-const platforms = [ALL, ...Array.from(new Set(certifications.map((c) => c.platform)))]
-const issuers = new Set(certifications.map((c) => c.issuer)).size
-const scored = certifications.map(scoreOf).filter((n): n is number => n != null)
-const avgScore = scored.length ? Math.round(scored.reduce((a, b) => a + b, 0) / scored.length) : null
 
 /** Where an achievement line leads, picked from its wording. */
 function achievementTarget(text: string): { href?: string; project?: string } {
@@ -175,6 +172,11 @@ function CertCard({ c }: { c: Certification }) {
 /* ── section ────────────────────────────────────────────────────────────── */
 
 export function Certifications() {
+  useContent()
+  const platforms = useMemo(() => [ALL, ...Array.from(new Set(certifications.map((c) => c.platform)))], [certifications])
+  const issuers = new Set(certifications.map((c) => c.issuer)).size
+  const scored = certifications.map(scoreOf).filter((n): n is number => n != null)
+  const avgScore = scored.length ? Math.round(scored.reduce((a, b) => a + b, 0) / scored.length) : null
   const [filter, setFilter] = useState(ALL)
   const shown = useMemo(() => (filter === ALL ? certifications : certifications.filter((c) => c.platform === filter)), [filter])
 

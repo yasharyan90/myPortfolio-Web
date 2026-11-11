@@ -2,11 +2,12 @@ import { ArrowUpRight } from 'lucide-react'
 import { cloneElement, useCallback, useEffect, useRef, useState } from 'react'
 import { ActivityCalendar } from 'react-activity-calendar'
 import { SiGithub } from 'react-icons/si'
-import { bySocialId } from '../../data/socials'
 import { useTheme } from '../../hooks/useTheme'
 import type { ContributionCalendar } from '../../../api/contributions'
 import { cn } from '../../lib/cn'
 import { GlassPanel } from './GlassPanel'
+import { bySocialId } from '../../content/live'
+import { useContent } from '../../content/ContentProvider'
 
 /** GitHub's own contribution scales, so the graph reads exactly like the one on github.com */
 const THEME = {
@@ -43,6 +44,7 @@ type State = { status: 'loading' } | { status: 'ready'; data: ContributionCalend
  * Refetches when the tab regains focus and every five minutes while visible.
  */
 export function GitHubContributions() {
+  useContent()
   const { isDark } = useTheme()
   const github = bySocialId('github')
   const username = github.href.split('/').filter(Boolean).pop() ?? ''
