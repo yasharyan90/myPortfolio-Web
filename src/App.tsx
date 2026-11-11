@@ -11,6 +11,7 @@ import { Hero } from './components/sections/Hero'
 import { Projects } from './components/sections/Projects'
 import { Skills } from './components/sections/Skills'
 import { NowPage } from './components/pages/NowPage'
+import { ResumePage } from './components/pages/ResumePage'
 import { Terminal } from './components/terminal/Terminal'
 import { useRoute } from './hooks/useRoute'
 
@@ -28,6 +29,8 @@ export default function App() {
       <main>
         {path === '/now' ? (
           <NowPage />
+        ) : path === '/resume' ? (
+          <ResumePage />
         ) : (
           <>
             <Hero />

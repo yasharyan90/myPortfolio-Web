@@ -1,9 +1,9 @@
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
-import { ArrowDown, ChevronDown, Download, MapPin, RotateCcw, Terminal as TerminalIcon } from 'lucide-react'
+import { ArrowDown, ChevronDown, FileText, MapPin, RotateCcw, Terminal as TerminalIcon } from 'lucide-react'
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { profile } from '../../data/profile'
 import { socials } from '../../data/socials'
-import { Link } from '../../hooks/useRoute'
+import { Link, useRoute } from '../../hooks/useRoute'
 import { useTerminal } from '../../hooks/useTerminal'
 import { cn } from '../../lib/cn'
 import { appleEase, fadeUp, spring, stagger } from '../../lib/motion'
@@ -80,6 +80,7 @@ export function Hero() {
   const frameRef = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion()
   const { open: openTerminal } = useTerminal()
+  const { navigate } = useRoute()
   const [flipped, setFlipped] = useState(false)
 
   // portrait tilt toward the cursor
@@ -137,8 +138,8 @@ export function Hero() {
             <GlassButton href="#projects" iconRight={<ArrowDown className="h-4 w-4" />}>
               View projects
             </GlassButton>
-            <GlassButton href={profile.resume} variant="glass" download icon={<Download className="h-4 w-4" />}>
-              Download résumé
+            <GlassButton onClick={() => navigate(profile.resume)} variant="glass" icon={<FileText className="h-4 w-4" />}>
+              View résumé
             </GlassButton>
           </motion.div>
 

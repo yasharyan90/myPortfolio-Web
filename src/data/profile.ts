@@ -14,7 +14,8 @@ export const profile = {
   phone: '+91 9125200020',
   avatar: '/profile.jpg',
   avatarSmall: '/avatar.jpg',
-  resume: '/Yash_Aryan_Resume.pdf',
+  /** generated from this data at /resume — 'Save as PDF' there */
+  resume: '/resume',
   availability: 'Open to SDE / Full Stack internships',
   stats: [
     { label: 'DSA problems solved', value: 500, suffix: '+' },

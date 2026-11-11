@@ -1,5 +1,5 @@
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
-import { ArrowUp, ArrowUpRight, Download, GitCommitHorizontal, Terminal as TerminalIcon } from 'lucide-react'
+import { ArrowUp, ArrowUpRight, FileText, GitCommitHorizontal, Terminal as TerminalIcon } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { portfolioProject } from '../../data/now'
 import { profile } from '../../data/profile'
@@ -98,7 +98,7 @@ export function Footer() {
   const commitHref = isDeploy ? `${REPO}/commit/${__COMMIT_SHA__}` : REPO
 
   return (
-    <footer className="relative bg-parchment pb-10 pt-14">
+    <footer className="relative bg-parchment pb-10 pt-14 print:hidden">
       <div className="container-apple">
         <div className="border-t border-hairline pt-10">
           <div className="grid gap-10 md:grid-cols-[1.3fr_1fr_1fr_1fr]">
@@ -174,14 +174,13 @@ export function Footer() {
                   </button>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href={profile.resume}
-                    download
                     className="group inline-flex items-center gap-2 py-1 text-[14px] tracking-[-0.2px] text-ink-80 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-focus rounded-[4px]"
                   >
-                    <Download className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
-                    Download résumé
-                  </a>
+                    <FileText className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />
+                    View résumé
+                  </Link>
                 </li>
                 <li>
                   <FooterLink href={REPO} external>

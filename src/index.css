@@ -235,3 +235,21 @@
 @media (prefers-reduced-motion: reduce) {
   .now-toggle-pulse { animation: none !important; opacity: 0.6; transform: scale(1); }
 }
+
+/* ── Print (the /resume page) ─────────────────────────────────────────── */
+@media print {
+  @page { margin: 14mm; }
+  :root, :root.dark {
+    color-scheme: light;
+    --color-primary: #0066cc;
+    --color-ink: #1d1d1f;
+    --color-ink-80: #333333;
+    --color-ink-48: #6e6e73;
+    --color-canvas: #ffffff;
+    --color-parchment: #ffffff;
+    --color-pearl: #ffffff;
+  }
+  html { scroll-behavior: auto; }
+  body { background: #fff !important; font-size: 12.5px; }
+  .resume-sheet a { color: inherit; text-decoration: none; }
+}

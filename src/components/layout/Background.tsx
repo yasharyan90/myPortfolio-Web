@@ -23,7 +23,7 @@ export function Background({ tone: requestedTone = 'light', mode = 'fixed', clas
   return (
     <div
       aria-hidden
-      className={cn(mode === 'fixed' ? 'fixed inset-0 -z-10' : 'absolute inset-0 -z-0 overflow-hidden', className)}
+      className={cn(mode === 'fixed' ? 'fixed inset-0 -z-10' : 'absolute inset-0 -z-0 overflow-hidden', 'print:hidden', className)}
     >
       {orbs.map((o, i) => (
         <motion.div

@@ -5,6 +5,8 @@ export interface Line {
   tone?: LineTone
   /** when set, the line renders as a clickable link */
   href?: string
+  /** commands rendered as clickable chips after the text — clicking one runs it */
+  chips?: string[]
 }
 
 export type TermPalette = 'default' | 'green' | 'amber' | 'matrix' | 'dracula'

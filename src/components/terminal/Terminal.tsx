@@ -5,7 +5,7 @@ import { useTerminal } from '../../hooks/useTerminal'
 import { useTheme } from '../../hooks/useTheme'
 import { cn } from '../../lib/cn'
 import { appleEase } from '../../lib/motion'
-import { COMMAND_COUNT, PALETTES, SECTIONS, commandNames, fileNames, neofetch, projectIds, runCommand } from '../../terminal/commands'
+import { COMMAND_COUNT, PALETTES, SECTIONS, STARTER_COMMANDS, commandNames, fileNames, neofetch, projectIds, runCommand } from '../../terminal/commands'
 import type { Line, TermContext, TermPalette } from '../../terminal/types'
 import { MatrixRain } from './MatrixRain'
 
@@ -95,7 +95,8 @@ export function Terminal() {
             push([
               ...neofetch({ isDark: opts.isDark, palette: opts.palette, bootedAt: bootedAt.current }, window.innerWidth < 640),
               { text: '' },
-              { text: `Type 'help' to see all ${COMMAND_COUNT} commands.`, tone: 'dim' },
+              { text: `Type 'help' to see all ${COMMAND_COUNT} commands, or click one:`, tone: 'dim' },
+              { text: '', chips: STARTER_COMMANDS },
               { text: '' },
             ])
           },
@@ -245,6 +246,9 @@ export function Terminal() {
     } else if (e.key === 'ArrowRight' && !input && sessionCount === 0) {
       e.preventDefault()
       setInput('help')
+    } else if (e.key === 'ArrowRight' && ghost && e.currentTarget.selectionStart === input.length) {
+      e.preventDefault()
+      setInput(input + ghost)
     } else if ((e.key === 'l' || e.key === 'L') && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       setRows([])
@@ -254,6 +258,14 @@ export function Terminal() {
       setInput('')
     }
   }
+
+  /** fish-style inline hint: the first command that extends what's typed so far (single word only) */
+  const ghost = useMemo(() => {
+    const v = input
+    if (!v || /\s/.test(v)) return ''
+    const m = commandNames().find((n) => n.startsWith(v.toLowerCase()) && n !== v.toLowerCase())
+    return m ? m.slice(v.length) : ''
+  }, [input])
 
   const complete = () => {
     const parts = input.split(/\s+/)
@@ -309,7 +321,7 @@ export function Terminal() {
             if (e.target === e.currentTarget) close()
           }}
           className={cn(
-            'fixed inset-0 z-[100] flex items-center justify-center bg-black/35 backdrop-blur-[6px]',
+            'fixed inset-0 z-[100] flex items-center justify-center bg-black/35 backdrop-blur-[6px] print:hidden',
             fullscreen ? 'p-0 sm:p-4' : 'p-0 sm:p-6',
           )}
         >
@@ -370,18 +382,37 @@ export function Terminal() {
               <div className="relative z-10">
                 {rows.map((r) =>
                   r.kind === 'cmd' ? (
-                    <div key={r.id} className="whitespace-pre-wrap break-words">
+                    <div
+                      key={r.id}
+                      className="group/cmd whitespace-pre-wrap break-words"
+                      onClick={() => {
+                        if (r.text.trim() && !r.text.endsWith('^C')) {
+                          setInput(r.text)
+                          inputRef.current?.focus()
+                        }
+                      }}
+                      title={r.text.trim() ? 'Click to run again' : undefined}
+                    >
                       <Prompt />
-                      <span>{r.text}</span>
+                      <span className="cursor-pointer decoration-[var(--t-dim)] underline-offset-[3px] group-hover/cmd:underline">{r.text}</span>
                     </div>
                   ) : (
-                    <OutLine key={r.id} line={r.line} />
+                    <OutLine key={r.id} line={r.line} onRun={(c) => void submit(c)} />
                   ),
                 )}
 
                 {busy && <p className="text-[var(--t-dim)]">…</p>}
-                <div className={cn('flex items-center whitespace-pre', busy && 'opacity-0')}>
+                <div className={cn('relative flex items-center whitespace-pre', busy && 'opacity-0')}>
                   <Prompt />
+                  {ghost && (
+                    <span aria-hidden className="pointer-events-none absolute left-0 top-0 whitespace-pre font-mono text-[13.5px]">
+                      <span className="invisible">
+                        <Prompt />
+                        {input}
+                      </span>
+                      <span className="text-[var(--t-dim)] opacity-60">{ghost}</span>
+                    </span>
+                  )}
                   <input
                     ref={inputRef}
                     value={input}
@@ -403,9 +434,27 @@ export function Terminal() {
             {/* footer */}
             <div className="flex flex-shrink-0 items-center justify-between gap-3 border-t border-white/[0.08] px-4 py-1.5 text-[10.5px] text-[var(--t-dim)]">
               <span className="truncate">
-                type <b className="font-semibold text-[var(--t-green)]">help</b> · tab completes · ↑↓ history · esc closes
+                type <b className="font-semibold text-[var(--t-green)]">help</b> · tab / → completes · ↑↓ history · click output to run · esc closes
               </span>
-              <span className="hidden sm:inline">⌘K</span>
+              <span className="flex items-center gap-1.5" role="radiogroup" aria-label="Terminal palette">
+                {PALETTES.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    role="radio"
+                    aria-checked={palette === p}
+                    aria-label={`${p} palette`}
+                    title={p}
+                    onClick={() => setPalette(p)}
+                    data-palette={p}
+                    className={cn(
+                      'h-3 w-3 rounded-full ring-1 ring-white/20 transition-transform hover:scale-125',
+                      palette === p && 'scale-125 ring-2 ring-[var(--t-green)]',
+                    )}
+                    style={{ background: 'var(--t-green)' }}
+                  />
+                ))}
+              </span>
             </div>
           </motion.div>
         </motion.div>
@@ -425,8 +474,25 @@ function Prompt() {
   )
 }
 
-function OutLine({ line }: { line: Line }) {
+function OutLine({ line, onRun }: { line: Line; onRun: (cmd: string) => void }) {
   const cls = cn('whitespace-pre-wrap break-words', toneClass[line.tone ?? 'default'])
+  if (line.chips?.length) {
+    return (
+      <div className={cn('flex flex-wrap items-center gap-1.5 py-0.5', cls)}>
+        {line.text && <span className="mr-1">{line.text}</span>}
+        {line.chips.map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => onRun(c)}
+            className="rounded-full border border-white/15 bg-white/[0.06] px-2 py-0.5 font-mono text-[12px] text-[var(--t-green)] transition-colors hover:border-[var(--t-green)]/60 hover:bg-white/[0.12] focus-visible:outline-1 focus-visible:outline-[var(--t-green)]"
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+    )
+  }
   if (line.text === '') return <div className="h-[1.2em]" />
   if (line.href) {
     const external = /^https?:/.test(line.href)

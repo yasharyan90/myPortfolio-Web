@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring } from 'framer-motion'
-import { Download, Menu, X } from 'lucide-react'
+import { FileText, Menu, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { profile } from '../../data/profile'
 import { useActiveSection } from '../../hooks/useActiveSection'
@@ -28,7 +28,7 @@ const BAND = 0.4
 
 export function Navbar() {
   const ids = useMemo(() => ['hero', ...NAV_LINKS.map((l) => l.id)], [])
-  const { path } = useRoute()
+  const { path, navigate } = useRoute()
   const sectionActive = useActiveSection(ids)
   const active = path === '/' ? sectionActive : ''
   const { isDark } = useTheme()
@@ -79,7 +79,7 @@ export function Navbar() {
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: appleEase, delay: 0.2 }}
-      className="fixed inset-x-0 top-0 z-50 px-4 pt-4"
+      className="fixed inset-x-0 top-0 z-50 px-4 pt-4 print:hidden"
       onFocusCapture={() => setHidden(false)}
     >
       <motion.div
@@ -191,8 +191,8 @@ export function Navbar() {
               <ThemeToggle />
             </Tooltip>
             <div className="hidden sm:block">
-              <Tooltip label="Download PDF">
-                <GlassButton href={profile.resume} size="sm" download icon={<Download className="h-3.5 w-3.5" />} magnetic={false}>
+              <Tooltip label="View · Save as PDF">
+                <GlassButton onClick={() => navigate(profile.resume)} size="sm" icon={<FileText className="h-3.5 w-3.5" />} magnetic={false}>
                   Résumé
                 </GlassButton>
               </Tooltip>
@@ -260,13 +260,13 @@ export function Navbar() {
               >
                 Now
               </Link>
-              <a
+              <Link
                 href={profile.resume}
-                download
+                onClick={() => setOpen(false)}
                 className="mt-1 flex items-center justify-center gap-2 rounded-[11px] bg-primary px-4 py-3 text-[17px] text-white"
               >
-                <Download className="h-4 w-4" /> Download résumé
-              </a>
+                <FileText className="h-4 w-4" /> View résumé
+              </Link>
             </motion.div>
           )}
         </AnimatePresence>

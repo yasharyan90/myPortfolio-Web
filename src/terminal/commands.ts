@@ -18,6 +18,7 @@ const red = (t: string) => L(t, 'red')
 const bold = (t: string) => L(t, 'bold')
 const link = (label: string, href: string) => L(label, 'cyan', href)
 const blank = () => L('')
+const chips = (text: string, cmds: string[], tone: Line['tone'] = 'dim'): Line => ({ text, tone, chips: cmds })
 
 const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)]
 const pad = (s: string, n: number) => (s.length >= n ? s : s + ' '.repeat(n - s.length))
@@ -63,7 +64,7 @@ const VIRTUAL_FILES: Record<string, () => Line[]> = {
   'education.txt': () => education.flatMap((e) => [green(e.school), L(`  ${e.degree} · ${e.period}`)]),
   'certifications.txt': () => certifications.map((c) => L(`• ${c.title} — ${c.issuer} (${c.platform})`)),
   'contact.txt': () => [L(`email  ${profile.email}`), L(`phone  ${profile.phone}`), L(`where  ${profile.location}`)],
-  'resume.pdf': () => [yellow("resume.pdf is a binary file — run 'resume' to open it.")],
+  'resume.md': () => [yellow("the résumé is generated live at /resume — run 'resume' to open it.")],
 }
 projects.forEach((p) => {
   VIRTUAL_FILES[`projects/${p.id}.md`] = () => projectLines(p)
@@ -112,10 +113,10 @@ reg('help', 'about', 'list every command, grouped', 'help [group]', (args) => {
     .forEach(([g, title]) => {
       const names = all.filter((c) => c.group === g).map((c) => c.name).sort()
       out.push(cyan(`${title} (${names.length})`))
-      for (let i = 0; i < names.length; i += 5) out.push(green('  ' + names.slice(i, i + 5).map((n) => pad(n, 15)).join('')))
+      out.push(chips('', names))
       out.push(blank())
     })
-  out.push(dim("'man <command>' explains any one of them."))
+  out.push(dim("click any command to run it · 'man <command>' explains any one of them."))
   return out
 })
 
@@ -148,7 +149,7 @@ reg('projects', 'about', "list projects — then 'project <name>'", null, () => 
   blank(),
   ...projects.map((p) => green(`  ${pad(p.id, 12)} ${p.name} — ${p.subtitle}`)),
   blank(),
-  dim("'project <id>' for details, or just type the id (bintrack, colcode, lumiere, vit-live, aurum, uhip)"),
+  chips('open one:', projects.map((p) => `project ${p.id}`)),
 ])
 
 reg('project', 'about', 'details for one project', 'project <id>', (args) => {
@@ -191,15 +192,26 @@ reg('certifications', 'about', 'certifications earned', null, () =>
   certifications.flatMap((c) => [green(c.title), dim(`  ${c.issuer} · ${c.platform}${c.badge ? ' · ' + c.badge : ''}`), L(`  ${c.topics.join(' · ')}`)]),
 )
 
-reg('stats', 'about', 'the numbers', null, () =>
-  profile.stats.map((s) => L(`${pad(String(s.value) + s.suffix, 10)} ${s.label}`, 'green')),
-)
+reg('stats', 'about', 'the numbers — plus live ones from GitHub and LeetCode', null, async () => {
+  const out: Line[] = profile.stats.map((s) => L(`${pad(String(s.value) + s.suffix, 10)} ${s.label}`, 'green'))
+  out.push(blank(), dim('live:'))
+  const gh = bySocialId('github').href.split('/').filter(Boolean).pop() ?? ''
+  const lc = bySocialId('leetcode').handle
+  const [user, leet] = await Promise.all([
+    fetch(`https://api.github.com/users/${gh}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    fetch(`/api/leetcode?user=${encodeURIComponent(lc)}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+  ])
+  if (user) out.push(cyan(`${pad(String(user.public_repos), 10)} public repos on GitHub`), cyan(`${pad(String(user.followers), 10)} followers`))
+  if (leet) out.push(cyan(`${pad(String(leet.solved.all), 10)} LeetCode solved (${leet.solved.easy} easy · ${leet.solved.medium} medium · ${leet.solved.hard} hard)`))
+  if (!user && !leet) out.push(red('live stats unavailable right now (rate limit?)'))
+  return out
+})
 
 reg('facts', 'about', 'quick facts', null, () => profile.facts.map((f) => L(`${pad(f.label, 10)} ${f.value}`)))
 
-reg('resume', 'about', 'open my résumé (PDF)', null, (_a, ctx) => {
-  ctx.openUrl(profile.resume)
-  return [cyan(`opening résumé → ${profile.resume}`)]
+reg('resume', 'about', 'open my résumé (generated live, save as PDF)', null, (_a, ctx) => {
+  ctx.openUrl(`${SITE_URL}${profile.resume}`)
+  return [cyan(`opening résumé → ${profile.resume}`), dim("it's generated from this site's data — use 'Save as PDF' there")]
 })
 reg('cv', 'about', 'alias of resume', null, (a, ctx) => COMMANDS.resume.run(a, ctx))
 
@@ -240,6 +252,7 @@ reg('status', 'about', 'current availability', null, () => [green(`● ${profile
 
 reg('now', 'about', "what I'm doing right now", null, () => [
   green(`${now.location.city}, ${now.location.region}`),
+  dim(`local time ${new Intl.DateTimeFormat('en-GB', { timeZone: now.timezone, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date())} ${now.timezoneLabel}`),
   ...now.focus.map((f) => L(`${pad(f.label, 10)} ${f.value}`)),
   L(`${pad('Building', 10)} ${workingOn.map((p) => p.name).join(' · ')}`),
   blank(),
@@ -312,7 +325,7 @@ reg('tree', 'navigate', 'directory tree of the portfolio', null, () => [
   L('├── education.txt'),
   L('├── certifications.txt'),
   L('├── contact.txt'),
-  L('└── resume.pdf'),
+  L('└── resume.md'),
   blank(),
   dim(`1 directory, ${7 + projects.length} files`),
 ])
@@ -322,7 +335,7 @@ reg('top', 'navigate', 'scroll back to the top', null, (_a, ctx) => {
   return [cyan('→ top')]
 })
 
-reg('sections', 'navigate', 'list every section you can cd into', null, () => [green(SECTIONS.join('  ')), dim("'cd <section>' to jump there")])
+reg('sections', 'navigate', 'list every section you can cd into', null, () => [chips('jump to:', SECTIONS.map((s) => `cd ${s}`))])
 
 reg('share', 'navigate', 'copy the link to this site', null, async (_a, ctx) => {
   const ok = await ctx.copy(SITE_URL)
@@ -370,7 +383,7 @@ reg('alias', 'shell', 'show shortcuts', null, () => [dim('cls → clear   cv →
 
 reg('theme', 'shell', 'switch terminal palette', 'theme <name>', (args, ctx) => {
   const t = args[0] as TermPalette | undefined
-  if (!t) return [dim(`palettes: ${PALETTES.join(', ')}`), dim(`current: ${ctx.palette}`)]
+  if (!t) return [chips(`current: ${ctx.palette} · pick one:`, PALETTES.map((p) => `theme ${p}`))]
   if (!PALETTES.includes(t)) return [red(`unknown palette: ${t}`), dim(`palettes: ${PALETTES.join(', ')}`)]
   ctx.setPalette(t)
   return [green(`palette → ${t}`)]
@@ -643,7 +656,18 @@ reg('flip', 'fun', 'flip text upside down', 'flip <text>', (args) => {
 
 reg('42', 'fun', 'the answer', null, () => [cyan('The answer to life, the universe, and everything.')])
 
-reg('weather', 'fun', "today's forecast", null, () => [yellow(`${profile.location.split(',')[0]}: 100% chance of shipping code today.`)])
+reg('weather', 'fun', "today's forecast — the real one, then mine", null, async () => {
+  const { lat, lon } = now.location.coords
+  try {
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&timezone=${encodeURIComponent(now.timezone)}`)
+    const j = (await r.json()) as { current: { temperature_2m: number; weather_code: number; relative_humidity_2m: number; wind_speed_10m: number } }
+    const c = j.current
+    const sky = c.weather_code === 0 ? 'clear' : c.weather_code <= 3 ? 'some cloud' : c.weather_code <= 48 ? 'fog' : c.weather_code <= 67 ? 'rain' : c.weather_code <= 77 ? 'snow' : c.weather_code <= 82 ? 'showers' : 'storms'
+    return [green(`${now.location.city}: ${Math.round(c.temperature_2m)}°C · ${sky} · humidity ${c.relative_humidity_2m}% · wind ${Math.round(c.wind_speed_10m)} km/h`), yellow('and a 100% chance of shipping code today.')]
+  } catch {
+    return [yellow(`${now.location.city}: 100% chance of shipping code today.`), dim('(live forecast unavailable)')]
+  }
+})
 
 reg('fortune', 'fun', 'a fortune cookie', null, () => [
   cyan(
@@ -695,5 +719,7 @@ reg('rickroll', 'fun', 'never gonna give you up', null, (_a, ctx) => {
 
 /* ── sanity: registry size ───────────────────────────────────────────── */
 export const COMMAND_COUNT = Object.keys(COMMANDS).length
+/** shown under the boot banner — one click each */
+export const STARTER_COMMANDS = ['help', 'projects', 'skills', 'now', 'stats', 'resume', 'weather', 'matrix']
 export const fileNames = () => Object.keys(VIRTUAL_FILES)
 export const projectIds = () => projects.map((p) => p.id)
