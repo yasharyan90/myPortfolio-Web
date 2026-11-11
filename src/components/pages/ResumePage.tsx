@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, Check, Link2, Mail, MapPin, Phone, Printer } from 'lucide-react'
+import { ArrowLeft, Check, Download, Link2, Mail, MapPin, Phone, Printer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { achievements, certifications } from '../../data/certifications'
 import { education } from '../../data/education'
@@ -60,12 +60,15 @@ export function ResumePage() {
               <p className="text-[14px] font-semibold tracking-[-0.224px] text-primary">Résumé</p>
               <h1 className="mt-2 font-display text-[34px] font-semibold leading-[1.1] tracking-[-0.02em] text-ink sm:text-[44px]">Always current.</h1>
               <p className="mt-3 max-w-[560px] text-[17px] font-light leading-[1.45] text-ink-48">
-                This résumé is generated from the same data that powers the site, so it never goes stale. Save it as a PDF from your browser's print dialog.
+                Download the original PDF, or save this page — it's generated from the same data that powers the site, so it never goes stale.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <GlassButton onClick={() => window.print()} icon={<Printer className="h-4 w-4" />} magnetic={false}>
-                Save as PDF
+              <GlassButton href={profile.resumePdf} download icon={<Download className="h-4 w-4" />} magnetic={false} ariaLabel="Download the original résumé PDF">
+                Download PDF
+              </GlassButton>
+              <GlassButton onClick={() => window.print()} variant="glass" icon={<Printer className="h-4 w-4" />} magnetic={false}>
+                Save this page as PDF
               </GlassButton>
               <GlassButton onClick={copyLink} variant="glass" icon={copied ? <Check className="h-4 w-4 text-primary" /> : <Link2 className="h-4 w-4" />} magnetic={false}>
                 {copied ? 'Link copied' : 'Copy link'}

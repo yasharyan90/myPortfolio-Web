@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
-import { ArrowDown, ChevronDown, FileText, MapPin, RotateCcw, Terminal as TerminalIcon } from 'lucide-react'
+import { ArrowDown, ChevronDown, Download, FileText, MapPin, RotateCcw, Terminal as TerminalIcon } from 'lucide-react'
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { profile } from '../../data/profile'
 import { socials } from '../../data/socials'
@@ -140,6 +140,9 @@ export function Hero() {
             </GlassButton>
             <GlassButton onClick={() => navigate(profile.resume)} variant="glass" icon={<FileText className="h-4 w-4" />}>
               View résumé
+            </GlassButton>
+            <GlassButton href={profile.resumePdf} download variant="glass" icon={<Download className="h-4 w-4" />} ariaLabel="Download résumé PDF">
+              Download PDF
             </GlassButton>
           </motion.div>
 

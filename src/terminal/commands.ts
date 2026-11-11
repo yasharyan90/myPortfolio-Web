@@ -64,7 +64,8 @@ const VIRTUAL_FILES: Record<string, () => Line[]> = {
   'education.txt': () => education.flatMap((e) => [green(e.school), L(`  ${e.degree} · ${e.period}`)]),
   'certifications.txt': () => certifications.map((c) => L(`• ${c.title} — ${c.issuer} (${c.platform})`)),
   'contact.txt': () => [L(`email  ${profile.email}`), L(`phone  ${profile.phone}`), L(`where  ${profile.location}`)],
-  'resume.md': () => [yellow("the résumé is generated live at /resume — run 'resume' to open it.")],
+  'resume.md': () => [yellow("the résumé is generated live at /resume — run 'resume' to open it, 'cv' for the PDF.")],
+  'resume.pdf': () => [yellow("resume.pdf is a binary file — run 'cv' to download it.")],
 }
 projects.forEach((p) => {
   VIRTUAL_FILES[`projects/${p.id}.md`] = () => projectLines(p)
@@ -211,9 +212,12 @@ reg('facts', 'about', 'quick facts', null, () => profile.facts.map((f) => L(`${p
 
 reg('resume', 'about', 'open my résumé (generated live, save as PDF)', null, (_a, ctx) => {
   ctx.openUrl(`${SITE_URL}${profile.resume}`)
-  return [cyan(`opening résumé → ${profile.resume}`), dim("it's generated from this site's data — use 'Save as PDF' there")]
+  return [cyan(`opening résumé → ${profile.resume}`), dim("generated from this site's data · 'cv' downloads the original PDF")]
 })
-reg('cv', 'about', 'alias of resume', null, (a, ctx) => COMMANDS.resume.run(a, ctx))
+reg('cv', 'about', 'download the original résumé PDF', null, (_a, ctx) => {
+  ctx.openUrl(`${SITE_URL}${profile.resumePdf}`)
+  return [cyan(`downloading → ${profile.resumePdf}`), dim("'resume' opens the live, always-current version")]
+})
 
 reg('contact', 'about', 'how to reach me', null, () => [
   link(`email     ${profile.email}`, `mailto:${profile.email}`),
@@ -325,7 +329,8 @@ reg('tree', 'navigate', 'directory tree of the portfolio', null, () => [
   L('├── education.txt'),
   L('├── certifications.txt'),
   L('├── contact.txt'),
-  L('└── resume.md'),
+  L('├── resume.md'),
+  L('└── resume.pdf'),
   blank(),
   dim(`1 directory, ${7 + projects.length} files`),
 ])

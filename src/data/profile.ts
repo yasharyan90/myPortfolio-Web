@@ -16,6 +16,8 @@ export const profile = {
   avatarSmall: '/avatar.jpg',
   /** generated from this data at /resume — 'Save as PDF' there */
   resume: '/resume',
+  /** the original PDF, served from public/ as a download */
+  resumePdf: '/Yash_Aryan_Resume.pdf',
   availability: 'Open to SDE / Full Stack internships',
   stats: [
     { label: 'DSA problems solved', value: 500, suffix: '+' },

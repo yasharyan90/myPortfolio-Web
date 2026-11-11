@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring } from 'framer-motion'
-import { FileText, Menu, X } from 'lucide-react'
+import { Download, FileText, Menu, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { profile } from '../../data/profile'
 import { useActiveSection } from '../../hooks/useActiveSection'
@@ -191,11 +191,26 @@ export function Navbar() {
               <ThemeToggle />
             </Tooltip>
             <div className="hidden sm:block">
-              <Tooltip label="View · Save as PDF">
-                <GlassButton onClick={() => navigate(profile.resume)} size="sm" icon={<FileText className="h-3.5 w-3.5" />} magnetic={false}>
-                  Résumé
-                </GlassButton>
-              </Tooltip>
+              <span className="inline-flex items-center gap-1">
+                <Tooltip label="View résumé">
+                  <GlassButton onClick={() => navigate(profile.resume)} size="sm" icon={<FileText className="h-3.5 w-3.5" />} magnetic={false}>
+                    Résumé
+                  </GlassButton>
+                </Tooltip>
+                <Tooltip label="Download PDF">
+                  <motion.a
+                    href={profile.resumePdf}
+                    download
+                    aria-label="Download résumé PDF"
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={spring}
+                    className="grid h-9 w-9 place-items-center rounded-full border border-black/[0.06] bg-white/60 text-ink transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-focus dark:border-white/10 dark:bg-white/[0.08] dark:hover:bg-white/[0.16]"
+                  >
+                    <Download className="h-4 w-4" />
+                  </motion.a>
+                </Tooltip>
+              </span>
             </div>
             <motion.button
               type="button"
@@ -260,13 +275,23 @@ export function Navbar() {
               >
                 Now
               </Link>
-              <Link
-                href={profile.resume}
-                onClick={() => setOpen(false)}
-                className="mt-1 flex items-center justify-center gap-2 rounded-[11px] bg-primary px-4 py-3 text-[17px] text-white"
-              >
-                <FileText className="h-4 w-4" /> View résumé
-              </Link>
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                <Link
+                  href={profile.resume}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 rounded-[11px] bg-primary px-4 py-3 text-[16px] text-white"
+                >
+                  <FileText className="h-4 w-4" /> View résumé
+                </Link>
+                <a
+                  href={profile.resumePdf}
+                  download
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 rounded-[11px] bg-ink px-4 py-3 text-[16px] text-on-ink"
+                >
+                  <Download className="h-4 w-4" /> Download PDF
+                </a>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
