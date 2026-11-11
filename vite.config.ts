@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { handleContributionsRequest } from './api/contributions'
@@ -31,7 +31,7 @@ function devApi(): Plugin {
 }
 
 // no @types/node in this project — the slice of `process` we read
-declare const process: { env: Record<string, string | undefined> }
+declare const process: { env: Record<string, string | undefined>; cwd(): string }
 
 /** Vercel exposes the deployed commit at build time; locally there is none, so the footer says "dev". */
 const sha = process.env.VERCEL_GIT_COMMIT_SHA ?? ''
@@ -41,7 +41,16 @@ const buildInfo = {
   __BUILT_AT__: JSON.stringify(new Date().toISOString()),
 }
 
-export default defineConfig({
-  plugins: [react(), tailwindcss(), devApi()],
-  define: buildInfo,
+export default defineConfig(({ mode }) => {
+  // Supabase: accept our own VITE_ names, or the names the Vercel–Supabase integration injects.
+  const fileEnv = loadEnv(mode, process.cwd(), '')
+  const pick = (...names: string[]) => names.map((n) => process.env[n] ?? fileEnv[n]).find(Boolean) ?? ''
+  return {
+    plugins: [react(), tailwindcss(), devApi()],
+    define: {
+      ...buildInfo,
+      'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(pick('VITE_SUPABASE_URL', 'SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL')),
+      'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(pick('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', 'NEXT_PUBLIC_SUPABASE_ANON_KEY')),
+    },
+  }
 })
