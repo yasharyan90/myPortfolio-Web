@@ -67,6 +67,8 @@ Every "Download PDF" button serves whatever file is uploaded in *Profile & conta
 - Edits are drafts (autosaved) until *Publish*. Every publish is kept in *History* and can be
   restored into the draft.
 - Only emails listed in `public.owners` can read drafts, write, publish or upload. Anyone can
-  read what is published. The anon key in the bundle can do nothing else.
+  read what is published. The anon key in the bundle can do nothing else. Drafts live in their
+  own table (`content_drafts`) that visitors cannot read or subscribe to; Realtime only carries
+  the published table.
 - `/api/keepalive` runs weekly (see `vercel.json` → `crons`) so a free-tier project never pauses.
   Even if it did, the site keeps serving the snapshot.
