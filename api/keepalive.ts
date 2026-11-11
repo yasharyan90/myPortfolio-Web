@@ -17,7 +17,7 @@ interface Res {
   end(body?: string): void
 }
 
-const env = (...names: string[]) => names.map((n) => process.env[n]).find(Boolean) ?? ''
+const env = (...names: string[]) => (names.map((n) => process.env[n]).find(Boolean) ?? '').trim()
 
 export default async function handler(_req: Req, res: Res): Promise<void> {
   const url = env('VITE_SUPABASE_URL', 'SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL')

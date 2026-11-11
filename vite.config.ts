@@ -44,12 +44,13 @@ const buildInfo = {
 export default defineConfig(({ mode }) => {
   // Supabase: accept our own VITE_ names, or the names the Vercel–Supabase integration injects.
   const fileEnv = loadEnv(mode, process.cwd(), '')
-  const pick = (...names: string[]) => names.map((n) => process.env[n] ?? fileEnv[n]).find(Boolean) ?? ''
+  // trim: a stray space/newline pasted into a dashboard env var survives HTTP headers but breaks the key inside a URL
+  const pick = (...names: string[]) => (names.map((n) => process.env[n] ?? fileEnv[n]).find(Boolean) ?? '').trim().replace(/^['"]|['"]$/g, '')
   return {
     plugins: [react(), tailwindcss(), devApi()],
     define: {
       ...buildInfo,
-      'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(pick('VITE_SUPABASE_URL', 'SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL')),
+      'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(pick('VITE_SUPABASE_URL', 'SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL').replace(/\/+$/, '')),
       'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(pick('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', 'NEXT_PUBLIC_SUPABASE_ANON_KEY')),
     },
   }

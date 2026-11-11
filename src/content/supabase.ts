@@ -6,8 +6,8 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
  * VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY, or from the names the Vercel–Supabase integration
  * injects (SUPABASE_URL / SUPABASE_ANON_KEY, NEXT_PUBLIC_…).
  */
-export const SUPABASE_URL: string = import.meta.env.VITE_SUPABASE_URL || ''
-export const SUPABASE_ANON_KEY: string = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+export const SUPABASE_URL: string = (import.meta.env.VITE_SUPABASE_URL || '').trim().replace(/\/+$/, '')
+export const SUPABASE_ANON_KEY: string = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim()
 
 export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY)
 
