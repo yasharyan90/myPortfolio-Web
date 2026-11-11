@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring } from 'framer-motion'
-import { Download, FileText, Menu, X } from 'lucide-react'
+import { Download, FileText, KeyRound, Menu, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { useActiveSection } from '../../hooks/useActiveSection'
 import { Link, useRoute } from '../../hooks/useRoute'
@@ -214,6 +214,21 @@ export function Navbar() {
                 </Tooltip>
               </span>
             </div>
+            <Tooltip label={path === '/admin' ? 'Owner console' : 'Owner sign-in'}>
+              <Link
+                href="/admin"
+                aria-label="Owner sign-in"
+                aria-current={path === '/admin' ? 'page' : undefined}
+                className={cn(
+                  'grid h-9 w-9 place-items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-focus',
+                  path === '/admin'
+                    ? 'border-transparent bg-ink text-on-ink'
+                    : 'border-black/[0.06] bg-white/60 text-ink hover:bg-white dark:border-white/10 dark:bg-white/[0.08] dark:hover:bg-white/[0.16]',
+                )}
+              >
+                <KeyRound className="h-4 w-4" />
+              </Link>
+            </Tooltip>
             <motion.button
               type="button"
               aria-label={open ? 'Close menu' : 'Open menu'}
@@ -276,6 +291,16 @@ export function Navbar() {
                 )}
               >
                 Now
+              </Link>
+              <Link
+                href="/admin"
+                onClick={() => setOpen(false)}
+                className={cn(
+                  'flex items-center gap-3 rounded-[11px] px-4 py-3 text-[17px] tracking-[-0.374px]',
+                  path === '/admin' ? 'bg-ink text-on-ink' : 'text-ink hover:bg-white/60 dark:hover:bg-white/10',
+                )}
+              >
+                <KeyRound className="h-4 w-4" /> Owner sign-in
               </Link>
               <div className="mt-1 grid grid-cols-2 gap-2">
                 <Link
