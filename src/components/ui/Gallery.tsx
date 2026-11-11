@@ -216,10 +216,31 @@ export function GalleryOverlay() {
 
 /* ── the small icon that opens it ───────────────────────────────────────── */
 
-export function GalleryButton({ className }: { className?: string }) {
+export function GalleryButton({ className, variant = 'badge' }: { className?: string; variant?: 'badge' | 'pill' }) {
   const { content } = useContent()
   const n = content.gallery.length
   if (n === 0) return null
+  if (variant === 'pill') {
+    // same anatomy as the social pills in the hero: glass, icon disc, label, trailing count
+    return (
+      <motion.button
+        type="button"
+        onClick={() => openGallery()}
+        whileHover={{ scale: 1.04, y: -1 }}
+        whileTap={{ scale: 0.96 }}
+        transition={spring}
+        aria-label={`Open gallery, ${n} photo${n === 1 ? '' : 's'}`}
+        className={cn('glass group relative flex h-11 items-center gap-2.5 overflow-hidden rounded-full pl-2.5 pr-4 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-focus', className)}
+      >
+        <span aria-hidden className="shine" />
+        <span className="relative z-10 grid h-7 w-7 place-items-center rounded-full bg-white/70 text-primary dark:bg-white/10">
+          <Images className="h-[15px] w-[15px]" />
+        </span>
+        <span className="relative z-10 text-[14px] font-normal tracking-[-0.224px]">Gallery</span>
+        <span className="relative z-10 rounded-full bg-primary/10 px-1.5 py-0.5 text-[11.5px] font-semibold tabular-nums text-primary">{n}</span>
+      </motion.button>
+    )
+  }
   return (
     <motion.button
       type="button"

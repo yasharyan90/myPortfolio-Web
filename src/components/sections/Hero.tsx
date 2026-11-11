@@ -153,6 +153,7 @@ export function Hero() {
             {socials.slice(0, 5).map((s) => (
               <SocialButton key={s.id} social={s} variant="pill" />
             ))}
+            <GalleryButton variant="pill" />
           </motion.div>
 
           <motion.div variants={fadeUp} className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] tracking-[-0.224px] text-ink-48">
@@ -237,10 +238,6 @@ export function Hero() {
               </div>
             </motion.button>
 
-            {/* gallery — floats over the portrait's top-right corner, hidden until photos exist */}
-            <motion.div animate={{ opacity: flipped ? 0 : 1 }} className={cn('absolute right-7 top-7 z-20', flipped && 'pointer-events-none')} style={{ z: 40 }}>
-              <GalleryButton />
-            </motion.div>
             {floatingChips.map((c) => (
               <motion.span
                 key={c.text}
