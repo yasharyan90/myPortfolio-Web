@@ -12,6 +12,7 @@ import { GlassButton } from '../ui/GlassButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { SocialButton } from '../ui/SocialButton'
 import { Tooltip } from '../ui/Tooltip'
+import { GalleryButton } from '../ui/Gallery'
 import { profile, socials } from '../../content/live'
 import { useContent } from '../../content/ContentProvider'
 import { resumeDownloadUrl, resumeFileName } from '../../content/resume'
@@ -236,6 +237,10 @@ export function Hero() {
               </div>
             </motion.button>
 
+            {/* gallery — floats over the portrait's top-right corner, hidden until photos exist */}
+            <motion.div animate={{ opacity: flipped ? 0 : 1 }} className={cn('absolute right-7 top-7 z-20', flipped && 'pointer-events-none')} style={{ z: 40 }}>
+              <GalleryButton />
+            </motion.div>
             {floatingChips.map((c) => (
               <motion.span
                 key={c.text}

@@ -16,7 +16,10 @@ import { Contact } from '../components/sections/Contact'
 import { Education } from '../components/sections/Education'
 import { Projects } from '../components/sections/Projects'
 import { Skills } from '../components/sections/Skills'
+import { GalleryGrid } from '../components/ui/Gallery'
+import type { GalleryDoc } from '../content/types'
 import { btnCls, FormRenderer, ListEditor, primaryBtnCls } from './fields'
+import { GalleryEditor } from './GalleryEditor'
 import { ResumePanel } from './ResumePanel'
 import { SPECS } from './specs'
 
@@ -68,6 +71,16 @@ const PREVIEW: Record<Section, () => ReactNode> = {
   certifications: () => <Certifications />,
   socials: () => <Coding />,
   now: () => <NowPage />,
+  gallery: () => <GalleryPreview />,
+}
+
+function GalleryPreview() {
+  const { content } = useContent()
+  return (
+    <div className="container-apple py-10">
+      <GalleryGrid items={content.gallery} onOpen={() => undefined} />
+    </div>
+  )
 }
 
 /* ── console ────────────────────────────────────────────────────────────── */
@@ -432,7 +445,9 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
 
                 <div className="mt-5">
                   {value != null &&
-                    (spec.root === 'list' ? (
+                    (spec.root === 'custom' && active === 'gallery' ? (
+                      <GalleryEditor value={value as GalleryDoc} onChange={onChange} backend={backend} />
+                    ) : spec.root === 'list' ? (
                       <ListEditor
                         spec={{ fields: spec.fields, itemLabel: spec.itemLabel!, newItem: spec.newItem!, collapsed: true, noun: spec.noun }}
                         value={value as Record<string, unknown>[]}

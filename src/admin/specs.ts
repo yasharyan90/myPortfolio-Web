@@ -12,8 +12,8 @@ export type FieldSpec =
   | { kind: 'object'; key: string; label: string; fields: FieldSpec[] }
 
 export interface SectionSpec {
-  /** when the section document is an array, these fields describe one item */
-  root: 'object' | 'list'
+  /** 'list': the document is an array of these fields; 'custom': a dedicated editor component */
+  root: 'object' | 'list' | 'custom'
   fields: FieldSpec[]
   itemLabel?: (item: Record<string, unknown>, i: number) => string
   newItem?: () => Record<string, unknown>
@@ -236,4 +236,5 @@ export const SPECS: Record<Section, SectionSpec> = {
       { kind: 'object', key: 'portfolioProject', label: 'This portfolio (shown with the working-on cards)', fields: projectFields },
     ],
   },
+  gallery: { root: 'custom', fields: [] },
 }

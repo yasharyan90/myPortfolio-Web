@@ -73,6 +73,20 @@ export interface NowDoc {
   portfolioProject: Project
 }
 
+/** One photo: the original (or a 2400 px re-encode) plus a 640 px thumbnail, both in the media bucket. */
+export interface GalleryImage {
+  id: string
+  src: string
+  thumb: string
+  width: number
+  height: number
+  caption?: string
+  alt?: string
+}
+export interface GalleryDoc {
+  items: GalleryImage[]
+}
+
 export interface ContentDoc {
   profile: ProfileDoc
   skills: SkillsDoc
@@ -81,10 +95,11 @@ export interface ContentDoc {
   certifications: CertificationsDoc
   socials: Social[]
   now: NowDoc
+  gallery: GalleryDoc
 }
 
 export type Section = keyof ContentDoc
-export const SECTIONS: Section[] = ['profile', 'skills', 'projects', 'education', 'certifications', 'socials', 'now']
+export const SECTIONS: Section[] = ['profile', 'skills', 'projects', 'education', 'certifications', 'socials', 'now', 'gallery']
 
 export const SECTION_LABELS: Record<Section, { title: string; blurb: string }> = {
   profile: { title: 'Profile & contact', blurb: 'Name, role, headline, summary, availability, contact details, stats and quick facts.' },
@@ -94,6 +109,7 @@ export const SECTION_LABELS: Record<Section, { title: string; blurb: string }> =
   certifications: { title: 'Certifications & achievements', blurb: 'Certificates with scores and verification links, and the achievement lines.' },
   socials: { title: 'Coding profiles & socials', blurb: 'Handles, links, brand colours and blurbs for GitHub, LeetCode, GFG, Codeforces, LinkedIn and email.' },
   now: { title: 'Now page', blurb: 'Where you are, what you are focused on, which projects are active.' },
+  gallery: { title: 'Gallery', blurb: 'Photos behind the gallery icon on your portrait. Uploads get a fast thumbnail and a high-resolution version.' },
 }
 
 /* ── resolved content: icons turned into components ─────────────────────── */
@@ -117,6 +133,7 @@ export interface ResolvedContent {
   now: NowDoc
   workingOn: Project[]
   portfolioProject: Project
+  gallery: GalleryImage[]
 }
 
 export interface SectionRow {

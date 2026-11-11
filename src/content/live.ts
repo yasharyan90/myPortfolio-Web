@@ -2,7 +2,7 @@ import { iconFor } from './icons'
 import { snapshot } from './snapshot'
 import type { ContentDoc, Project, ResolvedContent, ResolvedSkillGroup, ResolvedSocial } from './types'
 
-export type { Certification, Education, Project, ProjectLink, ResolvedSkill, ResolvedSkillGroup, ResolvedSocial } from './types'
+export type { Certification, Education, GalleryImage, Project, ProjectLink, ResolvedSkill, ResolvedSkillGroup, ResolvedSocial } from './types'
 
 /* ── resolve: JSON document → what components consume ───────────────────── */
 
@@ -31,6 +31,7 @@ export function resolveContent(doc: ContentDoc): ResolvedContent {
     now: doc.now,
     workingOn,
     portfolioProject: doc.now.portfolioProject,
+    gallery: doc.gallery?.items ?? [],
   }
 }
 
@@ -55,6 +56,7 @@ export let contactProfiles = content.contactProfiles
 export let now = content.now
 export let workingOn = content.workingOn
 export let portfolioProject = content.portfolioProject
+export let gallery = content.gallery
 
 export const bySocialId = (id: string) => socials.find((s) => s.id === id) ?? socials[0]
 
@@ -81,6 +83,7 @@ export function setLiveContent(doc: ContentDoc) {
   now = content.now
   workingOn = content.workingOn
   portfolioProject = content.portfolioProject
+  gallery = content.gallery
   listeners.forEach((l) => l(content))
 }
 

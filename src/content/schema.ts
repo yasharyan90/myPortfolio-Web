@@ -118,6 +118,20 @@ export const nowSchema = z.object({
   portfolioProject: projectSchema,
 })
 
+export const gallerySchema = z.object({
+  items: z.array(
+    z.object({
+      id: nonEmpty,
+      src: pathOrUrl,
+      thumb: pathOrUrl,
+      width: z.number().int().positive(),
+      height: z.number().int().positive(),
+      caption: z.string().max(300).optional(),
+      alt: z.string().max(300).optional(),
+    }),
+  ),
+})
+
 export const SECTION_SCHEMAS: { [K in Section]: z.ZodType<ContentDoc[K]> } = {
   profile: profileSchema as z.ZodType<ContentDoc['profile']>,
   skills: skillsSchema as z.ZodType<ContentDoc['skills']>,
@@ -126,6 +140,7 @@ export const SECTION_SCHEMAS: { [K in Section]: z.ZodType<ContentDoc[K]> } = {
   certifications: certificationsSchema as z.ZodType<ContentDoc['certifications']>,
   socials: socialsSchema as z.ZodType<ContentDoc['socials']>,
   now: nowSchema as z.ZodType<ContentDoc['now']>,
+  gallery: gallerySchema as z.ZodType<ContentDoc['gallery']>,
 }
 
 export function validateSection<K extends Section>(section: K, value: unknown): { ok: true; data: ContentDoc[K] } | { ok: false; issues: string[] } {

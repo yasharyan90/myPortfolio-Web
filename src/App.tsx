@@ -12,6 +12,7 @@ import { Projects } from './components/sections/Projects'
 import { Skills } from './components/sections/Skills'
 import { NowPage } from './components/pages/NowPage'
 import { ResumePage } from './components/pages/ResumePage'
+import { GalleryOverlay, GalleryPage } from './components/ui/Gallery'
 import { Suspense, lazy } from 'react'
 
 const AdminPage = lazy(() => import('./components/pages/AdminPage'))
@@ -34,6 +35,8 @@ export default function App() {
           <NowPage />
         ) : path === '/resume' ? (
           <ResumePage />
+        ) : path === '/gallery' ? (
+          <GalleryPage />
         ) : path === '/admin' ? (
           <Suspense fallback={<div className="container-apple pt-32 text-[14px] text-ink-48">Loading the console…</div>}>
             <AdminPage />
@@ -53,6 +56,7 @@ export default function App() {
       </main>
       <Footer />
       <Terminal />
+      <GalleryOverlay />
     </>
   )
 }

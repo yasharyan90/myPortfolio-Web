@@ -27,4 +27,5 @@ export const snapshot: ContentDoc = {
     workingOnIds: now.workingOnIds,
     portfolioProject,
   },
+  gallery: { items: [] },
 }

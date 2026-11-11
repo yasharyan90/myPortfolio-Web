@@ -1,4 +1,6 @@
 import { resumeDownloadAbsolute } from '../content/resume'
+import { gallery } from '../content/live'
+import { openGallery } from '../components/ui/Gallery'
 import type { Command, CommandResult, Line, TermContext, TermPalette } from './types'
 import { achievements, certifications, education, profile, projects, bySocialId, socials, competencies, skillGroups, now, workingOn } from '../content/live'
 
@@ -329,6 +331,13 @@ reg('tree', 'navigate', 'directory tree of the portfolio', null, () => [
   blank(),
   dim(`1 directory, ${7 + projects.length} files`),
 ])
+
+reg('gallery', 'navigate', 'open the photo gallery', null, (_a, ctx) => {
+  if (!gallery.length) return [dim('no photos published yet — upload some in the owner console')]
+  ctx.close()
+  window.setTimeout(() => openGallery(), 200)
+  return [cyan(`opening the gallery — ${gallery.length} photo${gallery.length === 1 ? '' : 's'}`)]
+})
 
 reg('admin', 'navigate', 'open the owner console (sign-in required)', null, (_a, ctx) => {
   ctx.openUrl('/admin')
