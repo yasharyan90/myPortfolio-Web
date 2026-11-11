@@ -90,9 +90,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       // the console posts the draft document; nothing is fetched or persisted here
       const onMessage = (e: MessageEvent) => {
         if (e.origin !== window.location.origin || e.source !== window.parent) return
-        const data = e.data as { type?: string; doc?: ContentDoc }
+        const data = e.data as { type?: string; doc?: Partial<ContentDoc> }
         if (data?.type === PREVIEW_MESSAGE && data.doc) {
-          apply(data.doc, 'local')
+          // tolerate a partial document: anything missing falls back to the bundled snapshot
+          apply(mergeSections(snapshot, data.doc), 'local')
           // land on the section the console is editing once the layout has settled
           const id = window.location.hash.replace(/^#/, '')
           if (id) window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'auto', block: 'start' }), 250)
