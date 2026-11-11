@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Copy, Plus, Trash2, Upload } from 'lucide-react'
+import { ChevronDown, ChevronUp, Copy, Plus, RotateCcw, Trash2, Upload } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { ContentBackend } from '../content/backend'
 import { ICON_NAMES, iconFor } from '../content/icons'
@@ -261,13 +261,23 @@ export function ListEditor({
   backend,
   path,
 }: {
-  spec: Extract<FieldSpec, { kind: 'list' }> | { fields: FieldSpec[]; itemLabel: (item: Record<string, unknown>, i: number) => string; newItem: () => Record<string, unknown>; collapsed?: boolean }
+  spec:
+    | Extract<FieldSpec, { kind: 'list' }>
+    | { fields: FieldSpec[]; itemLabel: (item: Record<string, unknown>, i: number) => string; newItem: () => Record<string, unknown>; collapsed?: boolean; noun?: string }
   value: Record<string, unknown>[]
   onChange: (v: Record<string, unknown>[]) => void
   backend: ContentBackend
   path: string
 }) {
+  const noun = spec.noun ?? 'item'
   const [open, setOpen] = useState<Record<number, boolean>>({})
+  /** index awaiting a second click on Delete */
+  const [confirm, setConfirm] = useState<number | null>(null)
+  /** last removed item, so it can be put back */
+  const [undo, setUndo] = useState<{ index: number; item: Record<string, unknown>; label: string } | null>(null)
+  const undoTimer = useRef<number>(0)
+  useEffect(() => () => window.clearTimeout(undoTimer.current), [])
+
   const set = (i: number, item: Record<string, unknown>) => onChange(value.map((x, j) => (j === i ? item : x)))
   const move = (i: number, d: number) => {
     const j = i + d
@@ -276,17 +286,56 @@ export function ListEditor({
     ;[next[i], next[j]] = [next[j], next[i]]
     onChange(next)
     setOpen((o) => ({ ...o, [i]: o[j] ?? false, [j]: o[i] ?? false }))
+    setConfirm(null)
   }
+  const duplicate = (i: number) => onChange([...value.slice(0, i + 1), JSON.parse(JSON.stringify(value[i])), ...value.slice(i + 1)])
+  const remove = (i: number) => {
+    const item = value[i]
+    onChange(value.filter((_, j) => j !== i))
+    setConfirm(null)
+    setOpen({})
+    setUndo({ index: i, item, label: spec.itemLabel(item, i) || `${noun} ${i + 1}` })
+    window.clearTimeout(undoTimer.current)
+    undoTimer.current = window.setTimeout(() => setUndo(null), 8000)
+  }
+  const restore = () => {
+    if (!undo) return
+    const next = [...value]
+    next.splice(Math.min(undo.index, next.length), 0, undo.item)
+    onChange(next)
+    setUndo(null)
+    window.clearTimeout(undoTimer.current)
+  }
+  const askDelete = (i: number) => {
+    if (confirm === i) remove(i)
+    else {
+      setConfirm(i)
+      setOpen((o) => ({ ...o, [i]: true }))
+      window.setTimeout(() => setConfirm((c) => (c === i ? null : c)), 6000)
+    }
+  }
+
   return (
     <div className="grid gap-2">
+      {undo && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-black/[0.06] bg-black/[0.03] px-3 py-2 text-[13px] text-ink dark:border-white/10 dark:bg-white/[0.06]" role="status">
+          <span>
+            Deleted <b>{undo.label}</b>. Not live until you publish.
+          </span>
+          <button type="button" onClick={restore} className={btnCls}>
+            <RotateCcw className="h-3.5 w-3.5" /> Undo
+          </button>
+        </div>
+      )}
       {value.map((item, i) => {
         const isOpen = open[i] ?? !spec.collapsed
+        const label = spec.itemLabel(item, i) || `${noun[0].toUpperCase()}${noun.slice(1)} ${i + 1}`
         return (
-          <div key={i} className="rounded-[12px] border border-black/10 bg-white/50 dark:border-white/10 dark:bg-white/[0.04]">
+          <div key={i} className={cn('rounded-[12px] border bg-white/50 dark:bg-white/[0.04]', confirm === i ? 'border-red-500/50' : 'border-black/10 dark:border-white/10')}>
             <div className="flex items-center gap-1 px-2 py-1.5">
               <button type="button" onClick={() => setOpen((o) => ({ ...o, [i]: !isOpen }))} className="flex min-w-0 flex-1 items-center gap-2 rounded-[8px] px-2 py-1 text-left text-[13.5px] font-semibold text-ink hover:bg-black/[0.04] dark:hover:bg-white/[0.06]" aria-expanded={isOpen}>
                 <ChevronDown className={cn('h-4 w-4 shrink-0 text-ink-48 transition-transform', isOpen && 'rotate-180')} />
-                <span className="truncate">{spec.itemLabel(item, i) || `Item ${i + 1}`}</span>
+                <span className="truncate">{label}</span>
                 <span className="ml-auto shrink-0 text-[11.5px] font-normal text-ink-48">#{i + 1}</span>
               </button>
               <IconBtn label="Move up" onClick={() => move(i, -1)} disabled={i === 0}>
@@ -295,16 +344,36 @@ export function ListEditor({
               <IconBtn label="Move down" onClick={() => move(i, 1)} disabled={i === value.length - 1}>
                 <ChevronDown className="h-3.5 w-3.5" />
               </IconBtn>
-              <IconBtn label="Duplicate" onClick={() => onChange([...value.slice(0, i + 1), JSON.parse(JSON.stringify(item)), ...value.slice(i + 1)])}>
+              <IconBtn label="Duplicate" onClick={() => duplicate(i)}>
                 <Copy className="h-3.5 w-3.5" />
               </IconBtn>
-              <IconBtn label="Delete" onClick={() => onChange(value.filter((_, j) => j !== i))} danger>
+              <IconBtn label={`Delete ${noun}`} onClick={() => askDelete(i)} danger>
                 <Trash2 className="h-3.5 w-3.5" />
               </IconBtn>
             </div>
             {isOpen && (
               <div className="border-t border-black/[0.06] px-4 py-4 dark:border-white/10">
                 <FormRenderer fields={spec.fields} value={item} onChange={(v) => set(i, v as Record<string, unknown>)} backend={backend} path={`${path}.${i}`} />
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-black/[0.06] pt-4 dark:border-white/10">
+                  <button type="button" onClick={() => duplicate(i)} className={btnCls}>
+                    <Copy className="h-3.5 w-3.5" /> Duplicate
+                  </button>
+                  {confirm === i ? (
+                    <span className="flex flex-wrap items-center gap-2 text-[13px] text-ink">
+                      Delete <b>{label}</b>?
+                      <button type="button" onClick={() => remove(i)} className={cn(primaryBtnCls, '!bg-red-600 hover:!bg-red-700')} data-testid="confirm-delete">
+                        <Trash2 className="h-3.5 w-3.5" /> Yes, delete
+                      </button>
+                      <button type="button" onClick={() => setConfirm(null)} className={btnCls}>
+                        Keep
+                      </button>
+                    </span>
+                  ) : (
+                    <button type="button" onClick={() => setConfirm(i)} className={cn(btnCls, 'text-red-600 hover:border-red-500/40 dark:text-red-400')} data-testid="delete-item">
+                      <Trash2 className="h-3.5 w-3.5" /> Delete this {noun}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -318,7 +387,7 @@ export function ListEditor({
         }}
         className={cn(btnCls, 'justify-center border-dashed')}
       >
-        <Plus className="h-3.5 w-3.5" /> Add
+        <Plus className="h-3.5 w-3.5" /> Add {noun}
       </button>
     </div>
   )

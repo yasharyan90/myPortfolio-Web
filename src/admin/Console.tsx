@@ -156,6 +156,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
   const saveDraft = useCallback(
     async (silent = false) => {
       if (!isSection(active) || value == null) return
+      if (!silent) window.clearTimeout(timer.current)
       setBusy('save')
       try {
         const r = await backend.saveDraft(active, value)
@@ -185,6 +186,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
 
   const publish = async () => {
     if (!isSection(active)) return
+    window.clearTimeout(timer.current)
     const check = validateSection(active, value)
     if (!check.ok) {
       setIssues(check.issues)
@@ -210,6 +212,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
 
   const discard = async () => {
     if (!isSection(active)) return
+    window.clearTimeout(timer.current)
     setBusy('discard')
     try {
       const r = await backend.discardDraft(active)
@@ -417,7 +420,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
                   {value != null &&
                     (spec.root === 'list' ? (
                       <ListEditor
-                        spec={{ fields: spec.fields, itemLabel: spec.itemLabel!, newItem: spec.newItem!, collapsed: true }}
+                        spec={{ fields: spec.fields, itemLabel: spec.itemLabel!, newItem: spec.newItem!, collapsed: true, noun: spec.noun }}
                         value={value as Record<string, unknown>[]}
                         onChange={onChange}
                         backend={backend}

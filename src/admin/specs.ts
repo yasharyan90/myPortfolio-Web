@@ -8,7 +8,7 @@ export type FieldSpec =
   | { kind: 'text' | 'textarea' | 'number' | 'color' | 'icon' | 'date' | 'url' | 'image' | 'file'; key: string; label: string; help?: string; placeholder?: string; accept?: string; uploadPath?: string; /** upload under this exact name (replaces the previous file) */ fixedName?: string; optional?: boolean }
   | { kind: 'select'; key: string; label: string; options: string[]; help?: string }
   | { kind: 'strings'; key: string; label: string; help?: string; placeholder?: string }
-  | { kind: 'list'; key: string; label: string; help?: string; fields: FieldSpec[]; itemLabel: (item: Record<string, unknown>, i: number) => string; newItem: () => Record<string, unknown>; collapsed?: boolean }
+  | { kind: 'list'; key: string; label: string; help?: string; fields: FieldSpec[]; itemLabel: (item: Record<string, unknown>, i: number) => string; newItem: () => Record<string, unknown>; collapsed?: boolean; /** what one item is called in buttons: "Add link", "Delete this link" */ noun?: string }
   | { kind: 'object'; key: string; label: string; fields: FieldSpec[] }
 
 export interface SectionSpec {
@@ -17,6 +17,7 @@ export interface SectionSpec {
   fields: FieldSpec[]
   itemLabel?: (item: Record<string, unknown>, i: number) => string
   newItem?: () => Record<string, unknown>
+  noun?: string
 }
 
 const projectFields: FieldSpec[] = [
@@ -42,6 +43,7 @@ const projectFields: FieldSpec[] = [
     ],
     itemLabel: (l) => String(l.label || l.href || 'link'),
     newItem: () => ({ label: 'Source on GitHub', href: 'https://github.com/', kind: 'github' }),
+    noun: 'link',
   },
   {
     kind: 'list',
@@ -54,6 +56,7 @@ const projectFields: FieldSpec[] = [
     ],
     itemLabel: (m) => `${m.value ?? ''} ${m.label ?? ''}`.trim() || 'metric',
     newItem: () => ({ label: '', value: '' }),
+    noun: 'metric',
   },
 ]
 
@@ -89,6 +92,7 @@ export const SPECS: Record<Section, SectionSpec> = {
         ],
         itemLabel: (s) => `${s.value ?? ''}${s.suffix ?? ''} ${s.label ?? ''}`.trim() || 'stat',
         newItem: () => ({ label: '', value: 0, suffix: '' }),
+        noun: 'stat',
       },
       {
         kind: 'list',
@@ -100,6 +104,7 @@ export const SPECS: Record<Section, SectionSpec> = {
         ],
         itemLabel: (f) => String(f.label || 'fact'),
         newItem: () => ({ label: '', value: '' }),
+        noun: 'fact',
       },
     ],
   },
@@ -125,10 +130,12 @@ export const SPECS: Record<Section, SectionSpec> = {
             ],
             itemLabel: (s) => String(s.name || 'skill'),
             newItem: () => ({ name: '', icon: 'TbCode', aliases: [] }),
+            noun: 'skill',
           },
         ],
         itemLabel: (g) => String(g.title || 'group'),
         newItem: () => ({ title: '', description: '', items: [] }),
+        noun: 'group',
       },
       { kind: 'strings', key: 'competencies', label: 'Core competencies' },
     ],
@@ -138,6 +145,7 @@ export const SPECS: Record<Section, SectionSpec> = {
     fields: projectFields,
     itemLabel: (p) => String(p.name || p.id || 'project'),
     newItem: () => ({ id: '', name: '', subtitle: '', kind: 'Personal project', accent: '#0a84ff', monogram: '', description: '', highlights: [], stack: [], links: [], metrics: [] }),
+    noun: 'project',
   },
   education: {
     root: 'list',
@@ -152,6 +160,7 @@ export const SPECS: Record<Section, SectionSpec> = {
     ],
     itemLabel: (e) => String(e.school || 'entry'),
     newItem: () => ({ school: '', degree: '', period: '', location: '' }),
+    noun: 'education entry',
   },
   certifications: {
     root: 'object',
@@ -170,6 +179,7 @@ export const SPECS: Record<Section, SectionSpec> = {
         ],
         itemLabel: (c) => String(c.title || 'certificate'),
         newItem: () => ({ title: '', issuer: '', platform: 'NPTEL', topics: [] }),
+        noun: 'certificate',
       },
       { kind: 'strings', key: 'achievements', label: 'Achievements', help: 'one per line' },
     ],
@@ -189,6 +199,7 @@ export const SPECS: Record<Section, SectionSpec> = {
     ],
     itemLabel: (s) => String(s.label || s.id || 'profile'),
     newItem: () => ({ id: '', label: '', handle: '', href: 'https://', color: '#0066cc', icon: 'TbWorld', blurb: '', cta: 'Open' }),
+    noun: 'profile',
   },
   now: {
     root: 'object',
@@ -219,6 +230,7 @@ export const SPECS: Record<Section, SectionSpec> = {
         ],
         itemLabel: (f) => String(f.label || 'focus'),
         newItem: () => ({ label: '', value: '', detail: '' }),
+        noun: 'focus item',
       },
       { kind: 'strings', key: 'workingOnIds', label: 'Working on (project ids)', help: 'newest first; must match ids in Projects' },
       { kind: 'object', key: 'portfolioProject', label: 'This portfolio (shown with the working-on cards)', fields: projectFields },
