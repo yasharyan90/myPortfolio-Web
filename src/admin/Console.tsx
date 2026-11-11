@@ -99,7 +99,8 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
   const [versions, setVersions] = useState<VersionRow[] | null>(null)
   const timer = useRef<number>(0)
 
-  const needsSeed = backend.kind === 'supabase' && !loadError && SECTIONS.every((s) => !rows[s]?.published)
+  const unseeded = backend.kind === 'supabase' && !loadError && loaded ? SECTIONS.filter((s) => !rows[s]?.published) : []
+  const needsSeed = unseeded.length > 0
 
   const load = useCallback(async () => {
     try {
@@ -328,10 +329,11 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
         {needsSeed && (
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-primary/30 bg-primary/10 p-4 text-[13.5px] text-ink">
             <span>
-              <b>The database is empty.</b> Seed it with the content currently built into the site, then edit from there.
+              <b>{unseeded.length === SECTIONS.length ? 'The database is empty.' : `${unseeded.length} section${unseeded.length > 1 ? 's are' : ' is'} not in the database yet`}</b>{' '}
+              {unseeded.length === SECTIONS.length ? 'Seed it with the content currently built into the site, then edit from there.' : `(${unseeded.map((s) => SECTION_LABELS[s].title).join(', ')}). Visitors see the built-in version of those until they are published. Seed them with the built-in content now?`}
             </span>
             <button type="button" onClick={seed} disabled={busy === 'seed'} className={primaryBtnCls}>
-              {busy === 'seed' ? 'Seeding…' : 'Seed from site'}
+              {busy === 'seed' ? 'Seeding…' : unseeded.length === SECTIONS.length ? 'Seed from site' : `Seed ${unseeded.length} section${unseeded.length > 1 ? 's' : ''}`}
             </button>
           </div>
         )}
