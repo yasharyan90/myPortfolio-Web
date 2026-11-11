@@ -7,7 +7,7 @@ import type { ContributionCalendar } from '../../../api/contributions'
 import { cn } from '../../lib/cn'
 import { GlassPanel } from './GlassPanel'
 import { bySocialId } from '../../content/live'
-import { useContent } from '../../content/ContentProvider'
+import { isPreviewFrame, useContent } from '../../content/ContentProvider'
 
 /** GitHub's own contribution scales, so the graph reads exactly like the one on github.com */
 const THEME = {
@@ -58,6 +58,10 @@ export function GitHubContributions() {
   for (let y = currentYear; y >= FIRST_YEAR; y--) years.push(y)
 
   const load = useCallback(async () => {
+    if (isPreviewFrame) {
+      setState({ status: 'error' })
+      return
+    }
     const id = ++seq.current
     try {
       const to = localToday()

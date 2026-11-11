@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { isPreviewFrame } from '../content/ContentProvider'
 import type { ContributionCalendar } from '../../api/contributions'
 import type { LeetCodeStats } from '../../api/leetcode'
 
@@ -28,9 +29,9 @@ const TTL = 5 * 60 * 1000
 
 /** Fetch once per session (sessionStorage, 5-minute TTL) and expose a loading / ready / error state. */
 function useLive<T>(key: string, load: () => Promise<T>, enabled = true): Live<T> {
-  const [state, setState] = useState<Live<T>>({ status: 'loading' })
+  const [state, setState] = useState<Live<T>>(() => (isPreviewFrame ? { status: 'error' } : { status: 'loading' }))
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || isPreviewFrame) return
     let alive = true
     try {
       const raw = sessionStorage.getItem(key)

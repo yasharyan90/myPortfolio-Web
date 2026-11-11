@@ -12,7 +12,6 @@ import { GlassPanel } from '../ui/GlassPanel'
 import { SectionHeading } from '../ui/SectionHeading'
 import { projects, type Project } from '../../content/live'
 import { useContent } from '../../content/ContentProvider'
-import { useInPreview } from '../../content/preview'
 
 const HEADING = {
   eyebrow: 'Projects',
@@ -442,8 +441,7 @@ function SwipeProjects() {
 export function Projects() {
   const reduce = useReducedMotion()
   const desktop = useMediaQuery('(min-width: 1024px)')
-  const inPreview = useInPreview()
-  const pinned = desktop && !reduce && !inPreview
+  const pinned = desktop && !reduce
   return (
     <section id="projects" className="relative bg-tile-1 text-white">
       {pinned ? <PinnedProjects /> : <SwipeProjects />}

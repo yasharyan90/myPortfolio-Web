@@ -35,7 +35,7 @@ import { LinkedProse } from '../ui/LinkedProse'
 import { SectionHeading } from '../ui/SectionHeading'
 import { Tooltip } from '../ui/Tooltip'
 import { now, workingOn, profile, bySocialId } from '../../content/live'
-import { useContent } from '../../content/ContentProvider'
+import { isPreviewFrame, useContent } from '../../content/ContentProvider'
 
 /* ── time helpers ────────────────────────────────────────────────────── */
 
@@ -104,8 +104,9 @@ function describeWeather(code: number, isDay: boolean): { label: string; icon: R
 }
 
 function useWeather(lat: number, lon: number, timeZone: string) {
-  const [w, setW] = useState<Weather | null | 'error'>(null)
+  const [w, setW] = useState<Weather | null | 'error'>(() => (isPreviewFrame ? 'error' : null))
   useEffect(() => {
+    if (isPreviewFrame) return
     const ctrl = new AbortController()
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day,relative_humidity_2m&timezone=${encodeURIComponent(timeZone)}`
     fetch(url, { signal: ctrl.signal })
@@ -136,9 +137,9 @@ function repoSlug(p: Project): string | null {
 }
 
 function useRepo(slug: string | null) {
-  const [info, setInfo] = useState<RepoInfo | null | 'error'>(null)
+  const [info, setInfo] = useState<RepoInfo | null | 'error'>(() => (isPreviewFrame ? 'error' : null))
   useEffect(() => {
-    if (!slug) return
+    if (!slug || isPreviewFrame) return
     const ctrl = new AbortController()
     fetch(`https://api.github.com/repos/${slug}`, { headers: { accept: 'application/vnd.github+json' }, signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
@@ -258,6 +259,10 @@ function useGitHubEvents(username: string) {
     }
   }, [username])
   useEffect(() => {
+    if (isPreviewFrame) {
+      setEvents('error')
+      return
+    }
     load()
     const id = window.setInterval(load, 2 * 60 * 1000)
     const onFocus = () => load()

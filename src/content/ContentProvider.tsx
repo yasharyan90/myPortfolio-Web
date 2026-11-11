@@ -21,6 +21,11 @@ const Ctx = createContext<ContentState | null>(null)
 
 export const CACHE_KEY = 'portfolio:content:published'
 export const LOCAL_KEY = 'portfolio:content:local'
+export const PREVIEW_MESSAGE = 'portfolio:preview'
+export const PREVIEW_READY = 'portfolio:preview-ready'
+
+/** True when this document is the owner console's preview iframe (same origin, ?preview=1). */
+export const isPreviewFrame = typeof window !== 'undefined' && window.parent !== window && new URLSearchParams(window.location.search).get('preview') === '1'
 
 function readJson<T>(key: string): T | null {
   try {
@@ -81,6 +86,22 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   useEffect(() => subscribeContent(() => setVersion((v) => v + 1)), [])
 
   useEffect(() => {
+    if (isPreviewFrame) {
+      // the console posts the draft document; nothing is fetched or persisted here
+      const onMessage = (e: MessageEvent) => {
+        if (e.origin !== window.location.origin || e.source !== window.parent) return
+        const data = e.data as { type?: string; doc?: ContentDoc }
+        if (data?.type === PREVIEW_MESSAGE && data.doc) {
+          apply(data.doc, 'local')
+          // land on the section the console is editing once the layout has settled
+          const id = window.location.hash.replace(/^#/, '')
+          if (id) window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'auto', block: 'start' }), 250)
+        }
+      }
+      window.addEventListener('message', onMessage)
+      window.parent.postMessage({ type: PREVIEW_READY }, window.location.origin)
+      return () => window.removeEventListener('message', onMessage)
+    }
     if (isSupabaseConfigured) {
       // 1. last known published content, instantly; 2. the network; 3. stay subscribed
       const cached = readJson<{ at: number; rows: Partial<Record<Section, unknown>> }>(CACHE_KEY)

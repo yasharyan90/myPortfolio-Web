@@ -1,25 +1,15 @@
-import { AlertTriangle, Check, Clock, Eye, EyeOff, History, LogOut, RotateCcw, Save, Send, Trash2 } from 'lucide-react'
-import { Component, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Check, Clock, Eye, EyeOff, History, LogOut, RotateCcw, Save, Send, Trash2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { ContentBackend } from '../content/backend'
 import { useContent } from '../content/ContentProvider'
-import { PreviewContext } from '../content/preview'
-import { setLiveContent } from '../content/live'
 import { validateSection } from '../content/schema'
 import { snapshot } from '../content/snapshot'
 import { SECTION_LABELS, SECTIONS, type ContentDoc, type Section, type SectionRow, type VersionRow } from '../content/types'
 import { cn } from '../lib/cn'
-import { NowPage } from '../components/pages/NowPage'
-import { About } from '../components/sections/About'
-import { Certifications } from '../components/sections/Certifications'
-import { Coding } from '../components/sections/Coding'
-import { Contact } from '../components/sections/Contact'
-import { Education } from '../components/sections/Education'
-import { Projects } from '../components/sections/Projects'
-import { Skills } from '../components/sections/Skills'
-import { GalleryGrid } from '../components/ui/Gallery'
 import type { GalleryDoc } from '../content/types'
 import { btnCls, FormRenderer, ListEditor, primaryBtnCls } from './fields'
 import { GalleryEditor } from './GalleryEditor'
+import { PreviewFrame } from './PreviewFrame'
 import { ResumePanel } from './ResumePanel'
 import { SPECS } from './specs'
 
@@ -37,50 +27,6 @@ function publishedDoc(rows: Rows): ContentDoc {
     if (p) (doc as unknown as Record<string, unknown>)[s] = p
   }
   return doc
-}
-
-class PreviewBoundary extends Component<{ children: ReactNode; resetKey: string }, { failed: boolean }> {
-  state = { failed: false }
-  static getDerivedStateFromError() {
-    return { failed: true }
-  }
-  componentDidUpdate(prev: { resetKey: string }) {
-    if (prev.resetKey !== this.props.resetKey && this.state.failed) this.setState({ failed: false })
-  }
-  render() {
-    if (this.state.failed)
-      return (
-        <div className="m-6 rounded-[12px] border border-amber-500/30 bg-amber-500/10 p-4 text-[13.5px] text-ink">
-          <AlertTriangle className="mb-1 h-4 w-4 text-amber-600" /> The preview couldn't render this draft. Fix the highlighted issues and it will come back.
-        </div>
-      )
-    return this.props.children
-  }
-}
-
-const PREVIEW: Record<Section, () => ReactNode> = {
-  profile: () => (
-    <>
-      <About />
-      <Contact />
-    </>
-  ),
-  skills: () => <Skills />,
-  projects: () => <Projects />,
-  education: () => <Education />,
-  certifications: () => <Certifications />,
-  socials: () => <Coding />,
-  now: () => <NowPage />,
-  gallery: () => <GalleryPreview />,
-}
-
-function GalleryPreview() {
-  const { content } = useContent()
-  return (
-    <div className="container-apple py-10">
-      <GalleryGrid items={content.gallery} onOpen={() => undefined} />
-    </div>
-  )
 }
 
 /* ── console ────────────────────────────────────────────────────────────── */
@@ -141,28 +87,6 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
     setVersions(null)
     setStatus(r?.draft ? 'Unpublished draft' : r?.published_at ? `Published ${fmt(r.published_at)}` : 'Not published yet')
   }, [active, loaded])
-
-  // live preview: this tab shows the draft in place of the published content
-  useEffect(() => {
-    if (!isSection(active) || value == null) return
-    const doc = publishedDoc(rows)
-    if (preview) (doc as unknown as Record<string, unknown>)[active] = value
-    try {
-      setLiveContent(doc)
-    } catch {
-      /* invalid draft shape — the boundary shows a message */
-    }
-  }, [active, value, preview, rows])
-
-  // on leaving the console, show the published content again
-  useEffect(
-    () => () => {
-      if (backend.kind === 'supabase') void refresh()
-      else setLiveContent(publishedDoc(rows))
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  )
 
   const upsertRow = (r: SectionRow) => setRows((m) => ({ ...m, [r.section]: r }))
 
@@ -278,11 +202,14 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
   }
 
   const spec = !isSection(active) ? null : SPECS[active]
-  const Preview = !isSection(active) ? null : PREVIEW[active]
-  const previewKey = useMemo(() => (!isSection(active) ? '' : `${active}:${JSON.stringify(value)?.length ?? 0}`), [active, value])
+  const previewDoc = useMemo(() => {
+    const doc = publishedDoc(rows)
+    if (isSection(active) && value != null) (doc as unknown as Record<string, unknown>)[active] = value
+    return doc
+  }, [rows, active, value])
 
   return (
-    <div className="container-apple grid gap-6 pb-16 pt-28 lg:grid-cols-[240px_minmax(0,1fr)]">
+    <div className="mx-auto grid w-full max-w-[1680px] gap-6 px-6 pb-16 pt-28 sm:px-8 lg:grid-cols-[220px_minmax(0,1fr)]">
       {/* sidebar */}
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-48">Sections</p>
@@ -374,7 +301,7 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
           <div>{settings}</div>
         ) : (
           spec && (
-            <div className={cn('grid gap-6', preview && 'xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]')}>
+            <div className={cn('grid gap-6', preview && 'xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]')}>
               {/* editor */}
               <div className="min-w-0">
                 <div className="flex flex-wrap items-end justify-between gap-3">
@@ -461,19 +388,11 @@ export function Console({ backend, email, onSignOut, settings }: Props) {
                 </div>
               </div>
 
-              {/* preview */}
-              {preview && Preview && (
+              {/* preview — the real site in its own viewport, fed the draft */}
+              {preview && isSection(active) && value != null && (
                 <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
                   <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-48">Live preview of the draft</p>
-                  <div className="max-h-[calc(100dvh-140px)] overflow-y-auto overflow-x-hidden rounded-[18px] border border-black/[0.06] bg-canvas dark:border-white/10">
-                    <PreviewBoundary resetKey={previewKey}>
-                      <PreviewContext.Provider value={true}>
-                        <div className="[&_section]:!py-10 [&_.container-apple]:!px-5" style={{ zoom: 0.8 }}>
-                          {Preview()}
-                        </div>
-                      </PreviewContext.Provider>
-                    </PreviewBoundary>
-                  </div>
+                  <PreviewFrame section={active} doc={previewDoc} />
                 </div>
               )}
             </div>
