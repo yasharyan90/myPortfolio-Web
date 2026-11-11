@@ -82,7 +82,7 @@ export const certificationsSchema = z.object({
       platform: nonEmpty,
       badge: z.string().optional(),
       topics: z.array(nonEmpty),
-      credentialUrl: url.optional(),
+      credentialUrl: pathOrUrl.optional(),
     }),
   ),
   achievements: z.array(nonEmpty),

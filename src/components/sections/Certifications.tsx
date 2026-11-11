@@ -178,7 +178,8 @@ export function Certifications() {
   const scored = certifications.map(scoreOf).filter((n): n is number => n != null)
   const avgScore = scored.length ? Math.round(scored.reduce((a, b) => a + b, 0) / scored.length) : null
   const [filter, setFilter] = useState(ALL)
-  const shown = useMemo(() => (filter === ALL ? certifications : certifications.filter((c) => c.platform === filter)), [filter])
+  // depends on the live content too, or the section would keep the snapshot after published content arrives
+  const shown = useMemo(() => (filter === ALL ? certifications : certifications.filter((c) => c.platform === filter)), [filter, certifications])
 
   const stats = [
     { value: certifications.length, label: 'certifications', suffix: '' },
