@@ -39,6 +39,20 @@ function localToday(): string {
 type State = { status: 'loading' } | { status: 'ready'; data: ContributionCalendar } | { status: 'error' }
 
 /**
+ * Fixed shade per day instead of GitHub's relative quartiles, so a few commits already read clearly:
+ * 0 → empty · 1 → light · 2 → mid · 3–4 → strong · 5+ → darkest.
+ */
+function levelFor(count: number): 0 | 1 | 2 | 3 | 4 {
+  if (count <= 0) return 0
+  if (count === 1) return 1
+  if (count === 2) return 2
+  if (count <= 4) return 3
+  return 4
+}
+
+const shade = (days: ContributionCalendar['days']) => days.map((d) => ({ ...d, level: levelFor(d.count) }))
+
+/**
  * Live contribution heatmap. Data comes from /api/contributions, which reads GitHub's public
  * contributions page directly (no token) for a range ending on the viewer's local today.
  * Refetches when the tab regains focus and every five minutes while visible.
@@ -174,7 +188,7 @@ export function GitHubContributions() {
           </p>
         ) : (
           <ActivityCalendar
-            data={state.status === 'ready' ? state.data.days : []}
+            data={state.status === 'ready' ? shade(state.data.days) : []}
             loading={state.status === 'loading'}
             colorScheme={isDark ? 'dark' : 'light'}
             theme={THEME}
