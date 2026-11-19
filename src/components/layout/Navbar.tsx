@@ -1,9 +1,18 @@
-import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring } from 'framer-motion'
+import {
+  AnimatePresence,
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion'
 import { Download, FileText, KeyRound, Menu, X } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
+import { useEffect, useMemo, useState, type MouseEvent } from 'react'
 import { useActiveSection } from '../../hooks/useActiveSection'
 import { Link, useRoute } from '../../hooks/useRoute'
-import { useTerminal } from '../../hooks/useTerminal'
 import { useTheme } from '../../hooks/useTheme'
 import { cn } from '../../lib/cn'
 import { appleEase, spring } from '../../lib/motion'
@@ -28,6 +37,11 @@ export const NAV_LINKS = [
 /** The same 40 %-from-top line useActiveSection uses to decide which section is current. */
 const BAND = 0.4
 
+/** Scroll distance (px) over which the bar condenses from its resting shape to the thin pill. */
+const CONDENSE_OVER = 180
+/** Spring that trails the raw scroll value so the glass feels like it has mass, not a hard link. */
+const liquid = { stiffness: 220, damping: 30, mass: 0.6 }
+
 export function Navbar() {
   useContent()
   const ids = useMemo(() => ['hero', ...NAV_LINKS.map((l) => l.id)], [])
@@ -35,12 +49,11 @@ export function Navbar() {
   const sectionActive = useActiveSection(ids)
   const active = path === '/' ? sectionActive : ''
   const { isDark } = useTheme()
-  const { isOpen: terminalOpen } = useTerminal()
 
   const [scrolled, setScrolled] = useState(false)
-  const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
   const [hover, setHover] = useState<string | null>(null)
+  const reduce = useReducedMotion()
 
   // how far through the active section the reader is — fills a hairline inside the active pill
   const progress = useMotionValue(0)
@@ -54,19 +67,58 @@ export function Navbar() {
   }
   useEffect(measure, [active]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // shrink after a little scroll; tuck away on scroll-down, return on scroll-up
-  const { scrollY } = useScroll()
-  const lastY = useRef(0)
+  // ── scroll-driven liquid glass ───────────────────────────────────────
+  // `t` runs 0 → 1 over the first CONDENSE_OVER px; a spring trails it so the
+  // bar condenses with a little inertia instead of snapping to each scroll tick.
+  const { scrollY, scrollYProgress } = useScroll()
+  const raw = useTransform(scrollY, [0, CONDENSE_OVER], [0, 1], { clamp: true })
+  const t = useSpring(raw, reduce ? { stiffness: 1000, damping: 100 } : liquid)
+
+  // shape: a tall, wide resting bar becomes a thin, narrower pill
+  const height = useTransform(t, [0, 1], [64, 46])
+  const maxWidth = useTransform(t, [0, 1], [1120, 940])
+  const topPad = useTransform(t, [0, 1], [16, 8])
+  const brandScale = useTransform(t, [0, 1], [1, 0.92])
+
+  // glass: thin, almost clear over the hero; thick, frosted and lifted once content runs under it
+  const blur = useTransform(t, [0, 1], [10, 30])
+  const saturate = useTransform(t, [0, 1], [130, 200])
+  const backdropFilter = useMotionTemplate`blur(${blur}px) saturate(${saturate}%)`
+  const tintA = useTransform(t, [0, 1], isDark ? [0.05, 0.17] : [0.36, 0.8])
+  const tintB = useTransform(t, [0, 1], isDark ? [0.02, 0.07] : [0.14, 0.5])
+  const edge = useTransform(t, [0, 1], isDark ? [0.08, 0.24] : [0.4, 0.9])
+  const lift = useTransform(t, [0, 1], [0, 18])
+  const liftA = useTransform(t, [0, 1], isDark ? [0, 0.55] : [0, 0.14])
+  const background = useMotionTemplate`linear-gradient(135deg, rgba(255,255,255,${tintA}) 0%, rgba(255,255,255,${tintB}) 100%)`
+  const border = useMotionTemplate`1px solid rgba(255,255,255,${edge})`
+  const rim = useTransform(t, [0, 1], isDark ? [0.08, 0.24] : [0.95, 0.95])
+  const under = isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.35)'
+  const boxShadow = useMotionTemplate`inset 0 1px 0 0 rgba(255,255,255,${rim}), inset 0 -1px 0 0 ${under}, 0 1px 2px rgba(0,0,0,0.04), 0 ${lift}px 44px -17px rgba(0,0,0,${liftA})`
+
+  // specular highlight that glides along the top edge as the page scrolls — the "liquid" in liquid glass
+  const specX = useSpring(useTransform(scrollYProgress, [0, 1], [12, 88]), liquid)
+  const specA = useTransform(t, [0, 1], isDark ? [0.18, 0.4] : [0.35, 0.85])
+  const specular = useMotionTemplate`radial-gradient(38% 160% at ${specX}% 0%, rgba(255,255,255,${specA}), transparent 60%)`
+
+  // cursor-following glow, as on GlassPanel
+  const mx = useMotionValue(-9999)
+  const my = useMotionValue(-9999)
+  const glowTint = isDark ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.9)'
+  const glow = useMotionTemplate`radial-gradient(260px circle at ${mx}px ${my}px, ${glowTint}, transparent 70%)`
+  const onGlassMove = (e: MouseEvent<HTMLElement>) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    mx.set(e.clientX - r.left)
+    my.set(e.clientY - r.top)
+  }
+  const onGlassLeave = () => {
+    mx.set(-9999)
+    my.set(-9999)
+  }
+
   useMotionValueEvent(scrollY, 'change', (y) => {
-    setScrolled(y > 24)
-    const dy = y - lastY.current
-    if (y < 80) setHidden(false)
-    else if (dy > 6) setHidden(true)
-    else if (dy < -6) setHidden(false)
-    lastY.current = y
+    setScrolled(y > CONDENSE_OVER / 2)
     measure()
   })
-  const tucked = hidden && !open && !terminalOpen
 
   const sectionLabel = NAV_LINKS.find((l) => l.id === active)?.label
   const compactLabel = scrolled && sectionLabel ? sectionLabel : null
@@ -82,29 +134,27 @@ export function Navbar() {
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: appleEase, delay: 0.2 }}
-      className="fixed inset-x-0 top-0 z-50 px-4 pt-4 print:hidden"
-      onFocusCapture={() => setHidden(false)}
+      style={{ paddingTop: topPad }}
+      className="fixed inset-x-0 top-0 z-50 px-4 print:hidden"
     >
-      <motion.div
-        animate={{ y: tucked ? -88 : 0, opacity: tucked ? 0 : 1 }}
-        transition={{ duration: 0.45, ease: appleEase }}
-        className="relative flex justify-center"
-        style={{ pointerEvents: tucked ? 'none' : 'auto' }}
-      >
+      <div className="relative flex justify-center">
         <motion.nav
-          layout
-          transition={spring}
-          className={cn(
-            'glass flex w-full max-w-[1120px] items-center justify-between rounded-full pl-5 pr-2 transition-[height] duration-300',
-            scrolled ? 'h-[52px]' : 'h-[60px]',
-          )}
+          onMouseMove={onGlassMove}
+          onMouseLeave={onGlassLeave}
+          style={{ height, maxWidth, backdropFilter, WebkitBackdropFilter: backdropFilter, background, border, boxShadow }}
+          className="glass flex w-full items-center justify-between rounded-full pl-5 pr-2"
         >
+          {/* liquid layers: gliding specular on the top edge + cursor glow; both clip to the pill's own radius */}
+          <motion.span aria-hidden className="pointer-events-none absolute inset-0 z-0 rounded-full" style={{ background: specular }} />
+          <motion.span aria-hidden className="pointer-events-none absolute inset-0 z-0 rounded-full" style={{ background: glow }} />
+
           {/* brand — on small screens the name gives way to the current section once you scroll */}
           <Tooltip label={path === '/' && scrolled ? 'Back to top' : undefined}>
+            <motion.div style={{ scale: brandScale }} className="origin-left">
             <Link
               href="/"
               onClick={onBrandClick}
-              className="group flex items-center gap-2.5 font-display text-[17px] font-semibold tracking-[-0.374px] text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-focus rounded-full"
+              className="group relative z-10 flex items-center gap-2.5 font-display text-[17px] font-semibold tracking-[-0.374px] text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-focus rounded-full"
             >
               <motion.img
                 src={profile.avatarSmall}
@@ -131,10 +181,11 @@ export function Navbar() {
                 </AnimatePresence>
               </span>
             </Link>
+            </motion.div>
           </Tooltip>
 
           {/* section links — hover highlight glides between items; the active pill carries a progress hairline */}
-          <ul className="relative hidden items-center gap-1 md:flex" onMouseLeave={() => setHover(null)}>
+          <ul className="relative z-10 hidden items-center gap-1 md:flex" onMouseLeave={() => setHover(null)}>
             {NAV_LINKS.map((l) => {
               const isActive = active === l.id
               const isHover = hover === l.id && !isActive
@@ -176,7 +227,7 @@ export function Navbar() {
             })}
           </ul>
 
-          <div className="flex items-center gap-2">
+          <div className="relative z-10 flex items-center gap-2">
             <Tooltip label={path === '/now' ? 'Back home' : 'Now'}>
               <NowToggle />
             </Tooltip>
@@ -261,7 +312,7 @@ export function Navbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.98 }}
               transition={{ duration: 0.35, ease: appleEase }}
-              className="glass absolute left-0 right-0 top-[68px] rounded-[18px] p-2 md:hidden"
+              className="glass absolute left-0 right-0 top-[calc(100%+8px)] rounded-[18px] p-2 md:hidden"
             >
               {NAV_LINKS.map((l, i) => (
                 <motion.div
@@ -323,7 +374,7 @@ export function Navbar() {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </motion.header>
   )
 }
