@@ -211,7 +211,7 @@ export function Hero() {
                         <p className="font-display text-[21px] font-semibold leading-tight">{profile.name}</p>
                         <p className="text-[13px] text-white/80">VIT Bhopal · Class of 2028</p>
                       </div>
-                      <span className="glass-dark rounded-full px-2.5 py-1 text-[12px]">CGPA 8.5</span>
+                      <span className="glass-dark rounded-full px-2.5 py-1 text-[12px]">CGPA 8.0</span>
                     </div>
                     <span className="glass-dark absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px] text-white/85">
                       <RotateCcw className="h-3 w-3" /> Tap to flip
