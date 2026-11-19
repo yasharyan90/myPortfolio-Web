@@ -15,7 +15,7 @@ export const education: Education[] = [
     detail: 'Specialization in Cloud Computing and Automation',
     period: '2024 — Sept 2028 (expected)',
     location: 'Bhopal, Madhya Pradesh',
-    score: 'CGPA 8.5 / 10',
+    score: 'CGPA 8.0 / 10',
     coursework: [
       'Data Structures & Algorithms',
       'DBMS',
