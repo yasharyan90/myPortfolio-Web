@@ -156,7 +156,7 @@ export const SPECS: Record<Section, SectionSpec> = {
       { kind: 'text', key: 'detail', label: 'Detail', optional: true },
       { kind: 'text', key: 'period', label: 'Period', help: 'e.g. "2024 — Sept 2028 (expected)" drives the progress bar' },
       { kind: 'text', key: 'location', label: 'Location' },
-      { kind: 'text', key: 'score', label: 'Score', placeholder: 'CGPA 8.0 / 10', optional: true },
+      { kind: 'text', key: 'score', label: 'Score', placeholder: 'CGPA 8.5 / 10', optional: true },
       { kind: 'strings', key: 'coursework', label: 'Coursework', help: 'one per line' },
     ],
     itemLabel: (e) => String(e.school || 'entry'),

@@ -21,7 +21,7 @@ export const profile = {
   availability: 'Open to SDE / Full Stack internships',
   stats: [
     { label: 'DSA problems solved', value: 500, suffix: '+' },
-    { label: 'CGPA at VIT Bhopal', value: 8.0, suffix: ' / 10', decimals: 1 },
+    { label: 'CGPA at VIT Bhopal', value: 8.5, suffix: ' / 10', decimals: 1 },
     { label: 'Lines of code in VIT Live', value: 13, suffix: 'K+' },
     { label: 'Production apps live', value: 2, suffix: '' },
   ],

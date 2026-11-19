@@ -44,7 +44,7 @@ This repository is my personal portfolio: an Apple-inspired, liquid-glass single
 
 <div align="center">
 
-| 500+ | 8.0 / 10 | 6 | 102 |
+| 500+ | 8.5 / 10 | 6 | 102 |
 | :---: | :---: | :---: | :---: |
 | DSA problems solved | CGPA at VIT Bhopal | Projects showcased | Terminal commands |
 

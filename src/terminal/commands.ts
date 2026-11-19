@@ -267,7 +267,7 @@ reg('hire', 'about', 'why you should hire me', null, () => [
   L('  • ships production apps that process real payments (Aurum) and stream real video (Lumière)'),
   L('  • understands real-time systems — WebSockets + Redis Pub/Sub at sub-second delivery (VIT Live)'),
   L('  • can own the infra — Docker Compose across five services (UHIP, S Grade)'),
-  L('  • has the fundamentals — 500+ DSA problems, CGPA 8.0'),
+  L('  • has the fundamentals — 500+ DSA problems, CGPA 8.5'),
   blank(),
   link(`→ ${profile.email}`, `mailto:${profile.email}`),
 ])
